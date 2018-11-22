@@ -24,91 +24,91 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 public class CustomDrawableFactory extends DynamicDrawableFactory implements Runnable {
-    private final Context mContext;
-    private final BroadcastReceiver mAutoUpdatePack;
-    private boolean mRegistered = false;
+	private final Context mContext;
+	private final BroadcastReceiver mAutoUpdatePack;
+	private boolean mRegistered = false;
 
-    String iconPack;
-    final Map<ComponentName, Integer> packComponents = new HashMap<>();
-    final Map<ComponentName, String> packCalendars = new HashMap<>();
-    final Map<Integer, CustomClock.Metadata> packClocks = new HashMap<>();
+	String iconPack;
+	final Map<ComponentName, Integer> packComponents = new HashMap<>();
+	final Map<ComponentName, String> packCalendars = new HashMap<>();
+	final Map<Integer, CustomClock.Metadata> packClocks = new HashMap<>();
 
-    private CustomClock mCustomClockDrawer;
-    private Semaphore waiter = new Semaphore(0);
+	private CustomClock mCustomClockDrawer;
+	private Semaphore waiter = new Semaphore(0);
 
-    public CustomDrawableFactory(Context context) {
-        super(context);
-        mContext = context;
-        mCustomClockDrawer = new CustomClock(context);
-        mAutoUpdatePack = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (!CustomIconUtils.usingValidPack(context)) {
-                    CustomIconUtils.setCurrentPack(context, "");
-                }
-                CustomIconUtils.applyIconPackAsync(context);
-            }
-        };
+	public CustomDrawableFactory(Context context) {
+		super(context);
+		mContext = context;
+		mCustomClockDrawer = new CustomClock(context);
+		mAutoUpdatePack = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (!CustomIconUtils.usingValidPack(context)) {
+					CustomIconUtils.setCurrentPack(context, "");
+				}
+				CustomIconUtils.applyIconPackAsync(context);
+			}
+		};
 
-        new LooperExecutor(LauncherModel.getWorkerLooper()).execute(this);
-    }
+		new LooperExecutor(LauncherModel.getWorkerLooper()).execute(this);
+	}
 
-    @Override
-    public void run() {
-        reloadIconPack();
-        waiter.release();
-    }
+	@Override
+	public void run() {
+		reloadIconPack();
+		waiter.release();
+	}
 
-    void reloadIconPack() {
-        iconPack = CustomIconUtils.getCurrentPack(mContext);
+	void reloadIconPack() {
+		iconPack = CustomIconUtils.getCurrentPack(mContext);
 
-        if (mRegistered) {
-            mContext.unregisterReceiver(mAutoUpdatePack);
-            mRegistered = false;
-        }
-        if (!iconPack.isEmpty()) {
-            mContext.registerReceiver(mAutoUpdatePack, ActionIntentFilter.newInstance(iconPack,
-                    Intent.ACTION_PACKAGE_CHANGED,
-                    Intent.ACTION_PACKAGE_REPLACED,
-                    Intent.ACTION_PACKAGE_FULLY_REMOVED),
-                    null,
-                    new Handler(LauncherModel.getWorkerLooper()));
-            mRegistered = true;
-        }
+		if (mRegistered) {
+			mContext.unregisterReceiver(mAutoUpdatePack);
+			mRegistered = false;
+		}
+		if (!iconPack.isEmpty()) {
+			mContext.registerReceiver(mAutoUpdatePack, ActionIntentFilter.newInstance(iconPack,
+					Intent.ACTION_PACKAGE_CHANGED,
+					Intent.ACTION_PACKAGE_REPLACED,
+					Intent.ACTION_PACKAGE_FULLY_REMOVED),
+					null,
+					new Handler(LauncherModel.getWorkerLooper()));
+			mRegistered = true;
+		}
 
-        packComponents.clear();
-        packCalendars.clear();
-        packClocks.clear();
-        if (CustomIconUtils.usingValidPack(mContext)) {
-            CustomIconUtils.parsePack(this, mContext.getPackageManager(), iconPack);
-        }
-    }
+		packComponents.clear();
+		packCalendars.clear();
+		packClocks.clear();
+		if (CustomIconUtils.usingValidPack(mContext)) {
+			CustomIconUtils.parsePack(this, mContext.getPackageManager(), iconPack);
+		}
+	}
 
-    synchronized void ensureInitialLoadComplete() {
-        if (waiter != null) {
-            waiter.acquireUninterruptibly();
-            waiter.release();
-            waiter = null;
-        }
-    }
+	synchronized void ensureInitialLoadComplete() {
+		if (waiter != null) {
+			waiter.acquireUninterruptibly();
+			waiter.release();
+			waiter = null;
+		}
+	}
 
-    @Override
-    public FastBitmapDrawable newIcon(Bitmap icon, ItemInfo info) {
-        ensureInitialLoadComplete();
-        ComponentName componentName = info.getTargetComponent();
-        if (packComponents.containsKey(info.getTargetComponent()) &&
-                CustomIconProvider.isEnabledForApp(mContext, new ComponentKey(componentName, info.user))) {
-            if (Utilities.ATLEAST_OREO &&
-                    info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
-                    info.user.equals(Process.myUserHandle())) {
-                int drawableId = packComponents.get(componentName);
-                if (packClocks.containsKey(drawableId)) {
-                    Drawable drawable = mContext.getPackageManager().getDrawable(iconPack, drawableId, null);
-                    return mCustomClockDrawer.drawIcon(icon, drawable, packClocks.get(drawableId));
-                }
-            }
-            return new FastBitmapDrawable(icon);
-        }
-        return super.newIcon(icon, info);
-    }
+	@Override
+	public FastBitmapDrawable newIcon(Bitmap icon, ItemInfo info) {
+		ensureInitialLoadComplete();
+		ComponentName componentName = info.getTargetComponent();
+		if (packComponents.containsKey(info.getTargetComponent()) &&
+				CustomIconProvider.isEnabledForApp(mContext, new ComponentKey(componentName, info.user))) {
+			if (Utilities.ATLEAST_OREO &&
+					info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
+					info.user.equals(Process.myUserHandle())) {
+				int drawableId = packComponents.get(componentName);
+				if (packClocks.containsKey(drawableId)) {
+					Drawable drawable = mContext.getPackageManager().getDrawable(iconPack, drawableId, null);
+					return mCustomClockDrawer.drawIcon(icon, drawable, packClocks.get(drawableId));
+				}
+			}
+			return new FastBitmapDrawable(icon);
+		}
+		return super.newIcon(icon, info);
+	}
 }

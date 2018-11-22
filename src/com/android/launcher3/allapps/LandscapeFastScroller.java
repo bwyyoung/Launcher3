@@ -27,37 +27,37 @@ import com.android.launcher3.views.RecyclerViewFastScroller;
  */
 public class LandscapeFastScroller extends RecyclerViewFastScroller {
 
-    public LandscapeFastScroller(Context context) {
-        super(context);
-    }
+	public LandscapeFastScroller(Context context) {
+		super(context);
+	}
 
-    public LandscapeFastScroller(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+	public LandscapeFastScroller(Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
 
-    public LandscapeFastScroller(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+	public LandscapeFastScroller(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+	}
 
-    @Override
-    public boolean handleTouchEvent(MotionEvent ev) {
-        // We handle our own touch event, no need to handle recycler view touch delegates.
-        return false;
-    }
+	@Override
+	public boolean handleTouchEvent(MotionEvent ev) {
+		// We handle our own touch event, no need to handle recycler view touch delegates.
+		return false;
+	}
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        event.offsetLocation(0, -mRv.getPaddingTop());
-        if (super.handleTouchEvent(event)) {
-            getParent().requestDisallowInterceptTouchEvent(true);
-        }
-        event.offsetLocation(0, mRv.getPaddingTop());
-        return true;
-    }
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		event.offsetLocation(0, -mRv.getPaddingTop());
+		if (super.handleTouchEvent(event)) {
+			getParent().requestDisallowInterceptTouchEvent(true);
+		}
+		event.offsetLocation(0, mRv.getPaddingTop());
+		return true;
+	}
 
-    @Override
-    public boolean shouldBlockIntercept(int x, int y) {
-        // If the user touched the scroll bar area, block swipe
-        return x >= 0 && x < getWidth() && y >= 0 && y < getHeight();
-    }
+	@Override
+	public boolean shouldBlockIntercept(int x, int y) {
+		// If the user touched the scroll bar area, block swipe
+		return x >= 0 && x < getWidth() && y >= 0 && y < getHeight();
+	}
 }

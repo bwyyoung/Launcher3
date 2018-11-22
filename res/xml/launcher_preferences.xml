@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2015 Google Inc.
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2015 Google Inc.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -20,7 +19,7 @@
         android:key="pref_icon_badging"
         android:title="@string/icon_badging_title"
         android:persistent="false"
-        android:widgetLayout="@layout/notification_pref_warning" >
+        android:widgetLayout="@layout/notification_pref_warning">
         <intent android:action="android.settings.NOTIFICATION_SETTINGS">
             <!-- This extra highlights the "Allow icon badges" field in Notification settings -->
             <extra
@@ -34,37 +33,32 @@
         android:title="@string/smartspace_preferences_in_settings"
         android:summary="@string/smartspace_preferences_in_settings_desc"
         android:defaultValue="true"
-        android:persistent="true"
-        />
+        android:persistent="true" />
 
     <SwitchPreference
         android:key="pref_add_icon_to_home"
         android:title="@string/auto_add_shortcuts_label"
         android:summary="@string/auto_add_shortcuts_description"
         android:defaultValue="true"
-        android:persistent="true"
-        />
+        android:persistent="true" />
 
     <SwitchPreference
         android:key="pref_enable_minus_one"
         android:title="@string/title_show_google_app"
         android:summary="@string/pref_show_google_now_summary"
-        android:defaultValue="true"
-        />
+        android:defaultValue="true" />
 
     <SwitchPreference
         android:key="pref_show_predictions"
         android:title="@string/title_app_suggestions"
         android:summary="@string/summary_app_suggestions"
-        android:defaultValue="true"
-        />
+        android:defaultValue="true" />
 
     <SwitchPreference
         android:key="pref_allowRotation"
         android:title="@string/allow_rotation_title"
         android:defaultValue="@bool/allow_rotation"
-        android:persistent="true"
-        />
+        android:persistent="true" />
 
     <ListPreference
         android:key="pref_override_theme"

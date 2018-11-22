@@ -37,170 +37,170 @@ import com.android.launcher3.util.Themes;
  */
 public class AllAppsBackgroundDrawable extends Drawable {
 
-    /**
-     * A helper class to position and orient a drawable to be drawn.
-     */
-    protected static class TransformedImageDrawable {
-        private Drawable mImage;
-        private float mXPercent;
-        private float mYPercent;
-        private int mGravity;
-        private int mAlpha;
+	/**
+	 * A helper class to position and orient a drawable to be drawn.
+	 */
+	protected static class TransformedImageDrawable {
+		private Drawable mImage;
+		private float mXPercent;
+		private float mYPercent;
+		private int mGravity;
+		private int mAlpha;
 
-        /**
-         * @param gravity If one of the Gravity center values, the x and y offset will take the width
-         *                and height of the image into account to center the image to the offset.
-         */
-        public TransformedImageDrawable(Context context, int resourceId, float xPct, float yPct,
-                int gravity) {
-            mImage = context.getDrawable(resourceId);
-            mXPercent = xPct;
-            mYPercent = yPct;
-            mGravity = gravity;
-        }
+		/**
+		 * @param gravity If one of the Gravity center values, the x and y offset will take the width
+		 *                and height of the image into account to center the image to the offset.
+		 */
+		public TransformedImageDrawable(Context context, int resourceId, float xPct, float yPct,
+										int gravity) {
+			mImage = context.getDrawable(resourceId);
+			mXPercent = xPct;
+			mYPercent = yPct;
+			mGravity = gravity;
+		}
 
-        public void setAlpha(int alpha) {
-            mImage.setAlpha(alpha);
-            mAlpha = alpha;
-        }
+		public void setAlpha(int alpha) {
+			mImage.setAlpha(alpha);
+			mAlpha = alpha;
+		}
 
-        public int getAlpha() {
-            return mAlpha;
-        }
+		public int getAlpha() {
+			return mAlpha;
+		}
 
-        public void updateBounds(Rect bounds) {
-            int width = mImage.getIntrinsicWidth();
-            int height = mImage.getIntrinsicHeight();
-            int left = bounds.left + (int) (mXPercent * bounds.width());
-            int top = bounds.top + (int) (mYPercent * bounds.height());
-            if ((mGravity & Gravity.CENTER_HORIZONTAL) == Gravity.CENTER_HORIZONTAL) {
-                left -= (width / 2);
-            }
-            if ((mGravity & Gravity.CENTER_VERTICAL) == Gravity.CENTER_VERTICAL) {
-                top -= (height / 2);
-            }
-            mImage.setBounds(left, top, left + width, top + height);
-        }
+		public void updateBounds(Rect bounds) {
+			int width = mImage.getIntrinsicWidth();
+			int height = mImage.getIntrinsicHeight();
+			int left = bounds.left + (int) (mXPercent * bounds.width());
+			int top = bounds.top + (int) (mYPercent * bounds.height());
+			if ((mGravity & Gravity.CENTER_HORIZONTAL) == Gravity.CENTER_HORIZONTAL) {
+				left -= (width / 2);
+			}
+			if ((mGravity & Gravity.CENTER_VERTICAL) == Gravity.CENTER_VERTICAL) {
+				top -= (height / 2);
+			}
+			mImage.setBounds(left, top, left + width, top + height);
+		}
 
-        public void draw(Canvas canvas) {
-            mImage.draw(canvas);
-        }
+		public void draw(Canvas canvas) {
+			mImage.draw(canvas);
+		}
 
-        public Rect getBounds() {
-            return mImage.getBounds();
-        }
-    }
+		public Rect getBounds() {
+			return mImage.getBounds();
+		}
+	}
 
-    protected final TransformedImageDrawable mHand;
-    protected final TransformedImageDrawable[] mIcons;
-    private final int mWidth;
-    private final int mHeight;
+	protected final TransformedImageDrawable mHand;
+	protected final TransformedImageDrawable[] mIcons;
+	private final int mWidth;
+	private final int mHeight;
 
-    private ObjectAnimator mBackgroundAnim;
+	private ObjectAnimator mBackgroundAnim;
 
-    public AllAppsBackgroundDrawable(Context context) {
-        Resources res = context.getResources();
-        mWidth = res.getDimensionPixelSize(R.dimen.all_apps_background_canvas_width);
-        mHeight = res.getDimensionPixelSize(R.dimen.all_apps_background_canvas_height);
+	public AllAppsBackgroundDrawable(Context context) {
+		Resources res = context.getResources();
+		mWidth = res.getDimensionPixelSize(R.dimen.all_apps_background_canvas_width);
+		mHeight = res.getDimensionPixelSize(R.dimen.all_apps_background_canvas_height);
 
-        context = new ContextThemeWrapper(context,
-                Themes.getAttrBoolean(context, R.attr.isMainColorDark)
-                        ? R.style.AllAppsEmptySearchBackground_Dark
-                        : R.style.AllAppsEmptySearchBackground);
-        mHand = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_hand,
-                0.575f, 0.f, Gravity.CENTER_HORIZONTAL);
-        mIcons = new TransformedImageDrawable[4];
-        mIcons[0] = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_icon_1,
-                0.375f, 0, Gravity.CENTER_HORIZONTAL);
-        mIcons[1] = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_icon_2,
-                0.3125f, 0.2f, Gravity.CENTER_HORIZONTAL);
-        mIcons[2] = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_icon_3,
-                0.475f, 0.26f, Gravity.CENTER_HORIZONTAL);
-        mIcons[3] = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_icon_4,
-                0.7f, 0.125f, Gravity.CENTER_HORIZONTAL);
-    }
+		context = new ContextThemeWrapper(context,
+				Themes.getAttrBoolean(context, R.attr.isMainColorDark)
+						? R.style.AllAppsEmptySearchBackground_Dark
+						: R.style.AllAppsEmptySearchBackground);
+		mHand = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_hand,
+				0.575f, 0.f, Gravity.CENTER_HORIZONTAL);
+		mIcons = new TransformedImageDrawable[4];
+		mIcons[0] = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_icon_1,
+				0.375f, 0, Gravity.CENTER_HORIZONTAL);
+		mIcons[1] = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_icon_2,
+				0.3125f, 0.2f, Gravity.CENTER_HORIZONTAL);
+		mIcons[2] = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_icon_3,
+				0.475f, 0.26f, Gravity.CENTER_HORIZONTAL);
+		mIcons[3] = new TransformedImageDrawable(context, R.drawable.ic_all_apps_bg_icon_4,
+				0.7f, 0.125f, Gravity.CENTER_HORIZONTAL);
+	}
 
-    /**
-     * Animates the background alpha.
-     */
-    public void animateBgAlpha(float finalAlpha, int duration) {
-        int finalAlphaI = (int) (finalAlpha * 255f);
-        if (getAlpha() != finalAlphaI) {
-            mBackgroundAnim = cancelAnimator(mBackgroundAnim);
-            mBackgroundAnim = ObjectAnimator.ofInt(this, LauncherAnimUtils.DRAWABLE_ALPHA,
-                    finalAlphaI);
-            mBackgroundAnim.setDuration(duration);
-            mBackgroundAnim.start();
-        }
-    }
+	/**
+	 * Animates the background alpha.
+	 */
+	public void animateBgAlpha(float finalAlpha, int duration) {
+		int finalAlphaI = (int) (finalAlpha * 255f);
+		if (getAlpha() != finalAlphaI) {
+			mBackgroundAnim = cancelAnimator(mBackgroundAnim);
+			mBackgroundAnim = ObjectAnimator.ofInt(this, LauncherAnimUtils.DRAWABLE_ALPHA,
+					finalAlphaI);
+			mBackgroundAnim.setDuration(duration);
+			mBackgroundAnim.start();
+		}
+	}
 
-    /**
-     * Sets the background alpha immediately.
-     */
-    public void setBgAlpha(float finalAlpha) {
-        int finalAlphaI = (int) (finalAlpha * 255f);
-        if (getAlpha() != finalAlphaI) {
-            mBackgroundAnim = cancelAnimator(mBackgroundAnim);
-            setAlpha(finalAlphaI);
-        }
-    }
+	/**
+	 * Sets the background alpha immediately.
+	 */
+	public void setBgAlpha(float finalAlpha) {
+		int finalAlphaI = (int) (finalAlpha * 255f);
+		if (getAlpha() != finalAlphaI) {
+			mBackgroundAnim = cancelAnimator(mBackgroundAnim);
+			setAlpha(finalAlphaI);
+		}
+	}
 
-    @Override
-    public int getIntrinsicWidth() {
-        return mWidth;
-    }
+	@Override
+	public int getIntrinsicWidth() {
+		return mWidth;
+	}
 
-    @Override
-    public int getIntrinsicHeight() {
-        return mHeight;
-    }
+	@Override
+	public int getIntrinsicHeight() {
+		return mHeight;
+	}
 
-    @Override
-    public void draw(Canvas canvas) {
-        mHand.draw(canvas);
-        for (int i = 0; i < mIcons.length; i++) {
-            mIcons[i].draw(canvas);
-        }
-    }
+	@Override
+	public void draw(Canvas canvas) {
+		mHand.draw(canvas);
+		for (int i = 0; i < mIcons.length; i++) {
+			mIcons[i].draw(canvas);
+		}
+	}
 
-    @Override
-    protected void onBoundsChange(Rect bounds) {
-        super.onBoundsChange(bounds);
-        mHand.updateBounds(bounds);
-        for (int i = 0; i < mIcons.length; i++) {
-            mIcons[i].updateBounds(bounds);
-        }
-        invalidateSelf();
-    }
+	@Override
+	protected void onBoundsChange(Rect bounds) {
+		super.onBoundsChange(bounds);
+		mHand.updateBounds(bounds);
+		for (int i = 0; i < mIcons.length; i++) {
+			mIcons[i].updateBounds(bounds);
+		}
+		invalidateSelf();
+	}
 
-    @Override
-    public void setAlpha(int alpha) {
-        mHand.setAlpha(alpha);
-        for (int i = 0; i < mIcons.length; i++) {
-            mIcons[i].setAlpha(alpha);
-        }
-        invalidateSelf();
-    }
+	@Override
+	public void setAlpha(int alpha) {
+		mHand.setAlpha(alpha);
+		for (int i = 0; i < mIcons.length; i++) {
+			mIcons[i].setAlpha(alpha);
+		}
+		invalidateSelf();
+	}
 
-    @Override
-    public int getAlpha() {
-        return mHand.getAlpha();
-    }
+	@Override
+	public int getAlpha() {
+		return mHand.getAlpha();
+	}
 
-    @Override
-    public void setColorFilter(ColorFilter colorFilter) {
-        // Do nothing
-    }
+	@Override
+	public void setColorFilter(ColorFilter colorFilter) {
+		// Do nothing
+	}
 
-    @Override
-    public int getOpacity() {
-        return PixelFormat.TRANSLUCENT;
-    }
+	@Override
+	public int getOpacity() {
+		return PixelFormat.TRANSLUCENT;
+	}
 
-    private ObjectAnimator cancelAnimator(ObjectAnimator animator) {
-        if (animator != null) {
-            animator.cancel();
-        }
-        return null;
-    }
+	private ObjectAnimator cancelAnimator(ObjectAnimator animator) {
+		if (animator != null) {
+			animator.cancel();
+		}
+		return null;
+	}
 }

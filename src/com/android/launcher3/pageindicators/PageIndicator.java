@@ -26,58 +26,63 @@ import com.android.launcher3.dynamicui.ExtractedColors;
  * Base class for a page indicator.
  */
 public abstract class PageIndicator extends FrameLayout {
-    private CaretDrawable mCaretDrawable;
+	private CaretDrawable mCaretDrawable;
 
-    protected int mNumPages = 1;
+	protected int mNumPages = 1;
 
-    public PageIndicator(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        setWillNotDraw(false);
-    }
+	public PageIndicator(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		setWillNotDraw(false);
+	}
 
-    public void setScroll(int currentScroll, int totalScroll) {}
+	public void setScroll(int currentScroll, int totalScroll) {
+	}
 
-    public void setActiveMarker(int activePage) {}
+	public void setActiveMarker(int activePage) {
+	}
 
-    public void addMarker() {
-        mNumPages++;
-        onPageCountChanged();
-    }
+	public void addMarker() {
+		mNumPages++;
+		onPageCountChanged();
+	}
 
-    public void removeMarker() {
-        mNumPages--;
-        onPageCountChanged();
-    }
+	public void removeMarker() {
+		mNumPages--;
+		onPageCountChanged();
+	}
 
-    public void setMarkersCount(int numMarkers) {
-        mNumPages = numMarkers;
-        onPageCountChanged();
-    }
+	public void setMarkersCount(int numMarkers) {
+		mNumPages = numMarkers;
+		onPageCountChanged();
+	}
 
-    public CaretDrawable getCaretDrawable() {
-        return mCaretDrawable;
-    }
+	public CaretDrawable getCaretDrawable() {
+		return mCaretDrawable;
+	}
 
-    public void setCaretDrawable(CaretDrawable caretDrawable) {
-        if (mCaretDrawable != null) {
-            mCaretDrawable.setCallback(null);
-        }
+	public void setCaretDrawable(CaretDrawable caretDrawable) {
+		if (mCaretDrawable != null) {
+			mCaretDrawable.setCallback(null);
+		}
 
-        mCaretDrawable = caretDrawable;
+		mCaretDrawable = caretDrawable;
 
-        if (mCaretDrawable != null) {
-            mCaretDrawable.setCallback(this);
-        }
-    }
+		if (mCaretDrawable != null) {
+			mCaretDrawable.setCallback(this);
+		}
+	}
 
-    protected void onPageCountChanged() {}
+	protected void onPageCountChanged() {
+	}
 
-    public void setShouldAutoHide(boolean shouldAutoHide) {}
+	public void setShouldAutoHide(boolean shouldAutoHide) {
+	}
 
-    public void updateColor(ExtractedColors extractedColors) {}
+	public void updateColor(ExtractedColors extractedColors) {
+	}
 
-    @Override
-    protected boolean verifyDrawable(Drawable who) {
-        return super.verifyDrawable(who) || who == getCaretDrawable();
-    }
+	@Override
+	protected boolean verifyDrawable(Drawable who) {
+		return super.verifyDrawable(who) || who == getCaretDrawable();
+	}
 }

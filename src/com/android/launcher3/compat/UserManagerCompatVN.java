@@ -24,26 +24,26 @@ import android.os.UserHandle;
 @TargetApi(Build.VERSION_CODES.N)
 public class UserManagerCompatVN extends UserManagerCompatVM {
 
-    UserManagerCompatVN(Context context) {
-        super(context);
-    }
+	UserManagerCompatVN(Context context) {
+		super(context);
+	}
 
-    @Override
-    public boolean isQuietModeEnabled(UserHandle user) {
-        try {
-            return mUserManager.isQuietModeEnabled(user);
-        } catch (SecurityException ex) {
-            return false;
-        }
-    }
+	@Override
+	public boolean isQuietModeEnabled(UserHandle user) {
+		try {
+			return mUserManager.isQuietModeEnabled(user);
+		} catch (SecurityException ex) {
+			return false;
+		}
+	}
 
-    @Override
-    public boolean isUserUnlocked(UserHandle user) {
-        try {
-            return mUserManager.isUserUnlocked(user);
-        } catch (SecurityException ex) {
-            return false;
-        }
-    }
+	@Override
+	public boolean isUserUnlocked(UserHandle user) {
+		try {
+			return mUserManager.isUserUnlocked(user);
+		} catch (SecurityException ex) {
+			return false;
+		}
+	}
 }
 

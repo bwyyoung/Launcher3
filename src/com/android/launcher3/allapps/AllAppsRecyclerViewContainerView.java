@@ -34,40 +34,40 @@ import com.android.launcher3.R;
  * is launching.
  */
 public class AllAppsRecyclerViewContainerView extends RelativeLayout
-        implements BubbleTextShadowHandler {
+		implements BubbleTextShadowHandler {
 
-    private final ClickShadowView mTouchFeedbackView;
+	private final ClickShadowView mTouchFeedbackView;
 
-    public AllAppsRecyclerViewContainerView(Context context) {
-        this(context, null);
-    }
+	public AllAppsRecyclerViewContainerView(Context context) {
+		this(context, null);
+	}
 
-    public AllAppsRecyclerViewContainerView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+	public AllAppsRecyclerViewContainerView(Context context, AttributeSet attrs) {
+		this(context, attrs, 0);
+	}
 
-    public AllAppsRecyclerViewContainerView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+	public AllAppsRecyclerViewContainerView(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
 
-        Launcher launcher = Launcher.getLauncher(context);
-        DeviceProfile grid = launcher.getDeviceProfile();
+		Launcher launcher = Launcher.getLauncher(context);
+		DeviceProfile grid = launcher.getDeviceProfile();
 
-        mTouchFeedbackView = new ClickShadowView(context);
+		mTouchFeedbackView = new ClickShadowView(context);
 
-        // Make the feedback view large enough to hold the blur bitmap.
-        int size = grid.allAppsIconSizePx + mTouchFeedbackView.getExtraSize();
-        addView(mTouchFeedbackView, size, size);
-    }
+		// Make the feedback view large enough to hold the blur bitmap.
+		int size = grid.allAppsIconSizePx + mTouchFeedbackView.getExtraSize();
+		addView(mTouchFeedbackView, size, size);
+	}
 
-    @Override
-    public void setPressedIcon(BubbleTextView icon, Bitmap background) {
-        if (icon == null || background == null) {
-            mTouchFeedbackView.setBitmap(null);
-            mTouchFeedbackView.animate().cancel();
-        } else if (mTouchFeedbackView.setBitmap(background)) {
-            View rv = findViewById(R.id.apps_list_view);
-            mTouchFeedbackView.alignWithIconView(icon, (ViewGroup) icon.getParent(), rv);
-            mTouchFeedbackView.animateShadow();
-        }
-    }
+	@Override
+	public void setPressedIcon(BubbleTextView icon, Bitmap background) {
+		if (icon == null || background == null) {
+			mTouchFeedbackView.setBitmap(null);
+			mTouchFeedbackView.animate().cancel();
+		} else if (mTouchFeedbackView.setBitmap(background)) {
+			View rv = findViewById(R.id.apps_list_view);
+			mTouchFeedbackView.alignWithIconView(icon, (ViewGroup) icon.getParent(), rv);
+			mTouchFeedbackView.animateShadow();
+		}
+	}
 }

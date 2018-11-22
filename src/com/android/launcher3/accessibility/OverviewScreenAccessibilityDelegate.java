@@ -31,66 +31,66 @@ import com.android.launcher3.config.FeatureFlags;
 
 public class OverviewScreenAccessibilityDelegate extends AccessibilityDelegate {
 
-    private static final int MOVE_BACKWARD = R.id.action_move_screen_backwards;
-    private static final int MOVE_FORWARD = R.id.action_move_screen_forwards;
+	private static final int MOVE_BACKWARD = R.id.action_move_screen_backwards;
+	private static final int MOVE_FORWARD = R.id.action_move_screen_forwards;
 
-    private final SparseArray<AccessibilityAction> mActions = new SparseArray<>();
-    private final Workspace mWorkspace;
+	private final SparseArray<AccessibilityAction> mActions = new SparseArray<>();
+	private final Workspace mWorkspace;
 
-    public OverviewScreenAccessibilityDelegate(Workspace workspace) {
-        mWorkspace = workspace;
+	public OverviewScreenAccessibilityDelegate(Workspace workspace) {
+		mWorkspace = workspace;
 
-        Context context = mWorkspace.getContext();
-        boolean isRtl = Utilities.isRtl(context.getResources());
-        mActions.put(MOVE_BACKWARD, new AccessibilityAction(MOVE_BACKWARD,
-                context.getText(isRtl ? R.string.action_move_screen_right :
-                    R.string.action_move_screen_left)));
-        mActions.put(MOVE_FORWARD, new AccessibilityAction(MOVE_FORWARD,
-                context.getText(isRtl ? R.string.action_move_screen_left :
-                    R.string.action_move_screen_right)));
-    }
+		Context context = mWorkspace.getContext();
+		boolean isRtl = Utilities.isRtl(context.getResources());
+		mActions.put(MOVE_BACKWARD, new AccessibilityAction(MOVE_BACKWARD,
+				context.getText(isRtl ? R.string.action_move_screen_right :
+						R.string.action_move_screen_left)));
+		mActions.put(MOVE_FORWARD, new AccessibilityAction(MOVE_FORWARD,
+				context.getText(isRtl ? R.string.action_move_screen_left :
+						R.string.action_move_screen_right)));
+	}
 
-    @Override
-    public boolean performAccessibilityAction(View host, int action, Bundle args) {
-        if (host != null) {
-            if (action == AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS ) {
-                int index = mWorkspace.indexOfChild(host);
-                mWorkspace.setCurrentPage(index);
-            } else if (action == MOVE_FORWARD) {
-                movePage(mWorkspace.indexOfChild(host) + 1, host);
-                return true;
-            } else if (action == MOVE_BACKWARD) {
-                movePage(mWorkspace.indexOfChild(host) - 1, host);
-                return true;
-            }
-        }
+	@Override
+	public boolean performAccessibilityAction(View host, int action, Bundle args) {
+		if (host != null) {
+			if (action == AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS) {
+				int index = mWorkspace.indexOfChild(host);
+				mWorkspace.setCurrentPage(index);
+			} else if (action == MOVE_FORWARD) {
+				movePage(mWorkspace.indexOfChild(host) + 1, host);
+				return true;
+			} else if (action == MOVE_BACKWARD) {
+				movePage(mWorkspace.indexOfChild(host) - 1, host);
+				return true;
+			}
+		}
 
-        return super.performAccessibilityAction(host, action, args);
-    }
+		return super.performAccessibilityAction(host, action, args);
+	}
 
-    private void movePage(int finalIndex, View view) {
-        mWorkspace.onStartReordering();
-        mWorkspace.removeView(view);
-        mWorkspace.addView(view, finalIndex);
-        mWorkspace.onEndReordering();
-        mWorkspace.announceForAccessibility(mWorkspace.getContext().getText(R.string.screen_moved));
+	private void movePage(int finalIndex, View view) {
+		mWorkspace.onStartReordering();
+		mWorkspace.removeView(view);
+		mWorkspace.addView(view, finalIndex);
+		mWorkspace.onEndReordering();
+		mWorkspace.announceForAccessibility(mWorkspace.getContext().getText(R.string.screen_moved));
 
-        mWorkspace.updateAccessibilityFlags();
-        view.performAccessibilityAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
-    }
+		mWorkspace.updateAccessibilityFlags();
+		view.performAccessibilityAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
+	}
 
-    @Override
-    public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfo info) {
-        super.onInitializeAccessibilityNodeInfo(host, info);
+	@Override
+	public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfo info) {
+		super.onInitializeAccessibilityNodeInfo(host, info);
 
-        int index = mWorkspace.indexOfChild(host);
-        if (index < mWorkspace.getChildCount() - 1) {
-            info.addAction(mActions.get(MOVE_FORWARD));
-        }
+		int index = mWorkspace.indexOfChild(host);
+		if (index < mWorkspace.getChildCount() - 1) {
+			info.addAction(mActions.get(MOVE_FORWARD));
+		}
 
-        int startIndex = mWorkspace.numCustomPages() + (FeatureFlags.QSB_ON_FIRST_SCREEN ? 1 : 0);
-        if (index > startIndex) {
-            info.addAction(mActions.get(MOVE_BACKWARD));
-        }
-    }
+		int startIndex = mWorkspace.numCustomPages() + (FeatureFlags.QSB_ON_FIRST_SCREEN ? 1 : 0);
+		if (index > startIndex) {
+			info.addAction(mActions.get(MOVE_BACKWARD));
+		}
+	}
 }

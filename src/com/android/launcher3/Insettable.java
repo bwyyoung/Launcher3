@@ -24,5 +24,5 @@ import android.graphics.Rect;
  */
 public interface Insettable {
 
-    void setInsets(Rect insets);
+	void setInsets(Rect insets);
 }

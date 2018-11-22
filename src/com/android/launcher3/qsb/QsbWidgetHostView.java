@@ -32,68 +32,68 @@ import com.android.launcher3.R;
  */
 public class QsbWidgetHostView extends AppWidgetHostView {
 
-    @ViewDebug.ExportedProperty(category = "launcher")
-    private int mPreviousOrientation;
+	@ViewDebug.ExportedProperty(category = "launcher")
+	private int mPreviousOrientation;
 
-    public QsbWidgetHostView(Context context) {
-        super(context);
-    }
+	public QsbWidgetHostView(Context context) {
+		super(context);
+	}
 
-    @Override
-    public void updateAppWidget(RemoteViews remoteViews) {
-        // Store the orientation in which the widget was inflated
-        mPreviousOrientation = getResources().getConfiguration().orientation;
-        super.updateAppWidget(remoteViews);
-    }
-
-
-    public boolean isReinflateRequired(int orientation) {
-        // Re-inflate is required if the orientation has changed since last inflation.
-        return mPreviousOrientation != orientation;
-    }
+	@Override
+	public void updateAppWidget(RemoteViews remoteViews) {
+		// Store the orientation in which the widget was inflated
+		mPreviousOrientation = getResources().getConfiguration().orientation;
+		super.updateAppWidget(remoteViews);
+	}
 
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        try {
-            super.onLayout(changed, left, top, right, bottom);
-        } catch (final RuntimeException e) {
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    // Update the widget with 0 Layout id, to reset the view to error view.
-                    updateAppWidget(new RemoteViews(getAppWidgetInfo().provider.getPackageName(), 0));
-                }
-            });
-        }
-    }
+	public boolean isReinflateRequired(int orientation) {
+		// Re-inflate is required if the orientation has changed since last inflation.
+		return mPreviousOrientation != orientation;
+	}
 
-    @Override
-    protected View getErrorView() {
-        return getDefaultView(this);
-    }
 
-    @Override
-    protected View getDefaultView() {
-        View v = super.getDefaultView();
-        v.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Launcher.getLauncher(getContext()).startSearch("", false, null, true);
-            }
-        });
-        return v;
-    }
+	@Override
+	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+		try {
+			super.onLayout(changed, left, top, right, bottom);
+		} catch (final RuntimeException e) {
+			post(new Runnable() {
+				@Override
+				public void run() {
+					// Update the widget with 0 Layout id, to reset the view to error view.
+					updateAppWidget(new RemoteViews(getAppWidgetInfo().provider.getPackageName(), 0));
+				}
+			});
+		}
+	}
 
-    public static View getDefaultView(ViewGroup parent) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.qsb_default_view, parent, false);
-        v.findViewById(R.id.btn_qsb_search).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Launcher.getLauncher(view.getContext()).startSearch("", false, null, true);
-            }
-        });
-        return v;
-    }
+	@Override
+	protected View getErrorView() {
+		return getDefaultView(this);
+	}
+
+	@Override
+	protected View getDefaultView() {
+		View v = super.getDefaultView();
+		v.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Launcher.getLauncher(getContext()).startSearch("", false, null, true);
+			}
+		});
+		return v;
+	}
+
+	public static View getDefaultView(ViewGroup parent) {
+		View v = LayoutInflater.from(parent.getContext())
+				.inflate(R.layout.qsb_default_view, parent, false);
+		v.findViewById(R.id.btn_qsb_search).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Launcher.getLauncher(view.getContext()).startSearch("", false, null, true);
+			}
+		});
+		return v;
+	}
 }

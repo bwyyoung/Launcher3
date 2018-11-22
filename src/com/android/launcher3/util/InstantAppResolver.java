@@ -30,16 +30,16 @@ import java.util.List;
  */
 public class InstantAppResolver {
 
-    public static InstantAppResolver newInstance(Context context) {
-        return Utilities.getOverrideObject(
-                InstantAppResolver.class, context, R.string.instant_app_resolver_class);
-    }
+	public static InstantAppResolver newInstance(Context context) {
+		return Utilities.getOverrideObject(
+				InstantAppResolver.class, context, R.string.instant_app_resolver_class);
+	}
 
-    public boolean isInstantApp(ApplicationInfo info) {
-        return false;
-    }
+	public boolean isInstantApp(ApplicationInfo info) {
+		return false;
+	}
 
-    public List<ApplicationInfo> getInstantApps() {
-        return Collections.emptyList();
-    }
+	public List<ApplicationInfo> getInstantApps() {
+		return Collections.emptyList();
+	}
 }

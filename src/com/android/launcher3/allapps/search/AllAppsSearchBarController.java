@@ -42,163 +42,164 @@ import java.util.ArrayList;
  * An interface to a search box that AllApps can command.
  */
 public class AllAppsSearchBarController
-        implements TextWatcher, OnEditorActionListener, ExtendedEditText.OnBackKeyListener {
+		implements TextWatcher, OnEditorActionListener, ExtendedEditText.OnBackKeyListener {
 
-    protected Launcher mLauncher;
-    protected Callbacks mCb;
-    protected ExtendedEditText mInput;
-    protected String mQuery;
+	protected Launcher mLauncher;
+	protected Callbacks mCb;
+	protected ExtendedEditText mInput;
+	protected String mQuery;
 
-    protected SearchAlgorithm mSearchAlgorithm;
-    protected InputMethodManager mInputMethodManager;
+	protected SearchAlgorithm mSearchAlgorithm;
+	protected InputMethodManager mInputMethodManager;
 
-    public void setVisibility(int visibility) {
-        mInput.setVisibility(visibility);
-    }
-    /**
-     * Sets the references to the apps model and the search result callback.
-     */
-    public final void initialize(
-            SearchAlgorithm searchAlgorithm, ExtendedEditText input,
-            Launcher launcher, Callbacks cb) {
-        mCb = cb;
-        mLauncher = launcher;
+	public void setVisibility(int visibility) {
+		mInput.setVisibility(visibility);
+	}
 
-        mInput = input;
-        mInput.addTextChangedListener(this);
-        mInput.setOnEditorActionListener(this);
-        mInput.setOnBackKeyListener(this);
+	/**
+	 * Sets the references to the apps model and the search result callback.
+	 */
+	public final void initialize(
+			SearchAlgorithm searchAlgorithm, ExtendedEditText input,
+			Launcher launcher, Callbacks cb) {
+		mCb = cb;
+		mLauncher = launcher;
 
-        mInputMethodManager = (InputMethodManager)
-                mInput.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		mInput = input;
+		mInput.addTextChangedListener(this);
+		mInput.setOnEditorActionListener(this);
+		mInput.setOnBackKeyListener(this);
 
-        mSearchAlgorithm = searchAlgorithm;
-    }
+		mInputMethodManager = (InputMethodManager)
+				mInput.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        // Do nothing
-    }
+		mSearchAlgorithm = searchAlgorithm;
+	}
 
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        // Do nothing
-    }
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		// Do nothing
+	}
 
-    @Override
-    public void afterTextChanged(final Editable s) {
-        mQuery = s.toString();
-        if (mQuery.isEmpty()) {
-            mSearchAlgorithm.cancel(true);
-            mCb.clearSearchResult();
-        } else {
-            mSearchAlgorithm.cancel(false);
-            mSearchAlgorithm.doSearch(mQuery, mCb);
-        }
-    }
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		// Do nothing
+	}
 
-    public void refreshSearchResult() {
-        if (TextUtils.isEmpty(mQuery)) {
-            return;
-        }
-        // If play store continues auto updating an app, we want to show partial result.
-        mSearchAlgorithm.cancel(false);
-        mSearchAlgorithm.doSearch(mQuery, mCb);
-    }
+	@Override
+	public void afterTextChanged(final Editable s) {
+		mQuery = s.toString();
+		if (mQuery.isEmpty()) {
+			mSearchAlgorithm.cancel(true);
+			mCb.clearSearchResult();
+		} else {
+			mSearchAlgorithm.cancel(false);
+			mSearchAlgorithm.doSearch(mQuery, mCb);
+		}
+	}
 
-    @Override
-    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        // Skip if it's not the right action
-        if (actionId != EditorInfo.IME_ACTION_SEARCH) {
-            return false;
-        }
+	public void refreshSearchResult() {
+		if (TextUtils.isEmpty(mQuery)) {
+			return;
+		}
+		// If play store continues auto updating an app, we want to show partial result.
+		mSearchAlgorithm.cancel(false);
+		mSearchAlgorithm.doSearch(mQuery, mCb);
+	}
 
-        // Skip if the query is empty
-        String query = v.getText().toString();
-        if (query.isEmpty()) {
-            ((InputMethodManager) mLauncher.getSystemService(Context.INPUT_METHOD_SERVICE))
-                    .hideSoftInputFromWindow(v.getWindowToken(), 0);
-            return false;
-        }
-        return mLauncher.startActivitySafely(v,
-                PackageManagerHelper.getMarketSearchIntent(mLauncher, query), null);
-    }
+	@Override
+	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		// Skip if it's not the right action
+		if (actionId != EditorInfo.IME_ACTION_SEARCH) {
+			return false;
+		}
 
-    @Override
-    public boolean onBackKey() {
-        // Only hide the search field if there is no query
-        String query = Utilities.trim(mInput.getEditableText().toString());
-        if (query.isEmpty()) {
-            reset();
-            return true;
-        }
-        return false;
-    }
+		// Skip if the query is empty
+		String query = v.getText().toString();
+		if (query.isEmpty()) {
+			((InputMethodManager) mLauncher.getSystemService(Context.INPUT_METHOD_SERVICE))
+					.hideSoftInputFromWindow(v.getWindowToken(), 0);
+			return false;
+		}
+		return mLauncher.startActivitySafely(v,
+				PackageManagerHelper.getMarketSearchIntent(mLauncher, query), null);
+	}
 
-    /**
-     * Resets the search bar state.
-     */
-    public void reset() {
-        unfocusSearchField();
-        mCb.clearSearchResult();
-        mInput.setText("");
-        mQuery = null;
-        hideKeyboard();
-    }
+	@Override
+	public boolean onBackKey() {
+		// Only hide the search field if there is no query
+		String query = Utilities.trim(mInput.getEditableText().toString());
+		if (query.isEmpty()) {
+			reset();
+			return true;
+		}
+		return false;
+	}
 
-    protected void hideKeyboard() {
-        mInputMethodManager.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
-    }
+	/**
+	 * Resets the search bar state.
+	 */
+	public void reset() {
+		unfocusSearchField();
+		mCb.clearSearchResult();
+		mInput.setText("");
+		mQuery = null;
+		hideKeyboard();
+	}
 
-    protected void unfocusSearchField() {
-        View nextFocus = mInput.focusSearch(View.FOCUS_DOWN);
-        if (nextFocus != null) {
-            nextFocus.requestFocus();
-        }
-    }
+	protected void hideKeyboard() {
+		mInputMethodManager.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
+	}
 
-    /**
-     * Focuses the search field to handle key events.
-     */
-    public void focusSearchField() {
-        mInput.showKeyboard();
-    }
+	protected void unfocusSearchField() {
+		View nextFocus = mInput.focusSearch(View.FOCUS_DOWN);
+		if (nextFocus != null) {
+			nextFocus.requestFocus();
+		}
+	}
 
-    /**
-     * Returns whether the search field is focused.
-     */
-    public boolean isSearchFieldFocused() {
-        return mInput.isFocused();
-    }
+	/**
+	 * Focuses the search field to handle key events.
+	 */
+	public void focusSearchField() {
+		mInput.showKeyboard();
+	}
 
-    /**
-     * Callback for getting search results.
-     */
-    public interface Callbacks {
+	/**
+	 * Returns whether the search field is focused.
+	 */
+	public boolean isSearchFieldFocused() {
+		return mInput.isFocused();
+	}
 
-        /**
-         * Called when the search is complete.
-         *
-         * @param apps sorted list of matching components or null if in case of failure.
-         */
-        void onSearchResult(String query, ArrayList<ComponentKey> apps);
+	/**
+	 * Callback for getting search results.
+	 */
+	public interface Callbacks {
 
-        /**
-         * Called when the search results should be cleared.
-         */
-        void clearSearchResult();
+		/**
+		 * Called when the search is complete.
+		 *
+		 * @param apps sorted list of matching components or null if in case of failure.
+		 */
+		void onSearchResult(String query, ArrayList<ComponentKey> apps);
 
-        /**
-         * Called when the app discovery is providing an update of search, which can either be
-         * START for starting a new discovery,
-         * UPDATE for providing a new search result, can be called multiple times,
-         * END for indicating the end of results.
-         *
-         * @param app result item if UPDATE, else null
-         * @param app the update state, START, UPDATE or END
-         */
-        void onAppDiscoverySearchUpdate(@Nullable AppDiscoveryItem app,
-                @NonNull AppDiscoveryUpdateState state);
-    }
+		/**
+		 * Called when the search results should be cleared.
+		 */
+		void clearSearchResult();
+
+		/**
+		 * Called when the app discovery is providing an update of search, which can either be
+		 * START for starting a new discovery,
+		 * UPDATE for providing a new search result, can be called multiple times,
+		 * END for indicating the end of results.
+		 *
+		 * @param app result item if UPDATE, else null
+		 * @param app the update state, START, UPDATE or END
+		 */
+		void onAppDiscoverySearchUpdate(@Nullable AppDiscoveryItem app,
+										@NonNull AppDiscoveryUpdateState state);
+	}
 
 }

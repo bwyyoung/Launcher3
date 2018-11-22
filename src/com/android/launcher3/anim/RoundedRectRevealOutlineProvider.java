@@ -26,52 +26,53 @@ import static com.android.launcher3.popup.PopupContainerWithArrow.ROUNDED_TOP_CO
 /**
  * A {@link RevealOutlineAnimation} that provides an outline that interpolates between two radii
  * and two {@link Rect}s.
- *
+ * <p>
  * An example usage of this provider is an outline that starts out as a circle and ends
  * as a rounded rectangle.
  */
 public class RoundedRectRevealOutlineProvider extends RevealOutlineAnimation {
-    private final float mStartRadius;
-    private final float mEndRadius;
+	private final float mStartRadius;
+	private final float mEndRadius;
 
-    private final Rect mStartRect;
-    private final Rect mEndRect;
+	private final Rect mStartRect;
+	private final Rect mEndRect;
 
-    private final @PopupContainerWithArrow.RoundedCornerFlags int mRoundedCorners;
+	private final @PopupContainerWithArrow.RoundedCornerFlags
+	int mRoundedCorners;
 
-    public RoundedRectRevealOutlineProvider(float startRadius, float endRadius, Rect startRect,
-            Rect endRect) {
-        this(startRadius, endRadius, startRect, endRect,
-                ROUNDED_TOP_CORNERS | ROUNDED_BOTTOM_CORNERS);
-    }
+	public RoundedRectRevealOutlineProvider(float startRadius, float endRadius, Rect startRect,
+											Rect endRect) {
+		this(startRadius, endRadius, startRect, endRect,
+				ROUNDED_TOP_CORNERS | ROUNDED_BOTTOM_CORNERS);
+	}
 
-    public RoundedRectRevealOutlineProvider(float startRadius, float endRadius, Rect startRect,
-            Rect endRect, int roundedCorners) {
-        mStartRadius = startRadius;
-        mEndRadius = endRadius;
-        mStartRect = startRect;
-        mEndRect = endRect;
-        mRoundedCorners = roundedCorners;
-    }
+	public RoundedRectRevealOutlineProvider(float startRadius, float endRadius, Rect startRect,
+											Rect endRect, int roundedCorners) {
+		mStartRadius = startRadius;
+		mEndRadius = endRadius;
+		mStartRect = startRect;
+		mEndRect = endRect;
+		mRoundedCorners = roundedCorners;
+	}
 
-    @Override
-    public boolean shouldRemoveElevationDuringAnimation() {
-        return false;
-    }
+	@Override
+	public boolean shouldRemoveElevationDuringAnimation() {
+		return false;
+	}
 
-    @Override
-    public void setProgress(float progress) {
-        mOutlineRadius = (1 - progress) * mStartRadius + progress * mEndRadius;
+	@Override
+	public void setProgress(float progress) {
+		mOutlineRadius = (1 - progress) * mStartRadius + progress * mEndRadius;
 
-        mOutline.left = (int) ((1 - progress) * mStartRect.left + progress * mEndRect.left);
-        mOutline.top = (int) ((1 - progress) * mStartRect.top + progress * mEndRect.top);
-        if ((mRoundedCorners & ROUNDED_TOP_CORNERS) == 0) {
-            mOutline.top -= mOutlineRadius;
-        }
-        mOutline.right = (int) ((1 - progress) * mStartRect.right + progress * mEndRect.right);
-        mOutline.bottom = (int) ((1 - progress) * mStartRect.bottom + progress * mEndRect.bottom);
-        if ((mRoundedCorners & ROUNDED_BOTTOM_CORNERS) == 0) {
-            mOutline.bottom += mOutlineRadius;
-        }
-    }
+		mOutline.left = (int) ((1 - progress) * mStartRect.left + progress * mEndRect.left);
+		mOutline.top = (int) ((1 - progress) * mStartRect.top + progress * mEndRect.top);
+		if ((mRoundedCorners & ROUNDED_TOP_CORNERS) == 0) {
+			mOutline.top -= mOutlineRadius;
+		}
+		mOutline.right = (int) ((1 - progress) * mStartRect.right + progress * mEndRect.right);
+		mOutline.bottom = (int) ((1 - progress) * mStartRect.bottom + progress * mEndRect.bottom);
+		if ((mRoundedCorners & ROUNDED_BOTTOM_CORNERS) == 0) {
+			mOutline.bottom += mOutlineRadius;
+		}
+	}
 }

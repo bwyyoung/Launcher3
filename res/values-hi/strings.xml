@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<?xml version="1.0" encoding="UTF-8"?><!--
 /*
 * Copyright (C) 2008 The Android Open Source Project
 *
@@ -17,8 +16,7 @@
 */
  -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name" msgid="649227358658669779">"Launcher3"</string>
     <string name="folder_name" msgid="7371454440695724752"></string>
     <string name="work_folder_name" msgid="3753320833950115786">"कार्यस्‍थल"</string>
@@ -147,8 +145,8 @@
     <string name="msg_disable_suggestions_prompt">सुझाव आपकी ऐप्लिकेशन सूची के शीर्ष पर नहीं दिखाई देंगे और उन्हें बनाने के लिए उपयोग किया गया उपयोग डेटा स्थायी रूप से मिटा दिया जाएगा.</string>
     <string name="label_turn_off_suggestions">बंद करें</string>
     <string name="action_edit">संपादित करें</string>
-  <string name="hide_app_sum">एप्लिकेशन दराज से एप्लिकेशन छुपाएं</string>
-  <string name="hide_app">एप्लिकेशन छुपाएँ</string>
+    <string name="hide_app_sum">एप्लिकेशन दराज से एप्लिकेशन छुपाएं</string>
+    <string name="hide_app">एप्लिकेशन छुपाएँ</string>
     <string name="icon_shape_rounded_square">गोल कोने वाला वर्ग</string>
     <string name="smartspace_hours_mins">%1$s घंटे %2$s मिनट</string>
     <string name="icon_shape_cylinder">सिलेंडर</string>

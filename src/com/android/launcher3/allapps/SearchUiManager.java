@@ -24,45 +24,46 @@ import android.view.KeyEvent;
  */
 public interface SearchUiManager {
 
-    /**
-     * Initializes the search manager.
-     */
-    void initialize(AlphabeticalAppsList appsList, AllAppsRecyclerView recyclerView);
+	/**
+	 * Initializes the search manager.
+	 */
+	void initialize(AlphabeticalAppsList appsList, AllAppsRecyclerView recyclerView);
 
-    /**
-     * A {@link SpringAnimation} that will be used when the user flings.
-     */
-    @NonNull SpringAnimation getSpringForFling();
+	/**
+	 * A {@link SpringAnimation} that will be used when the user flings.
+	 */
+	@NonNull
+	SpringAnimation getSpringForFling();
 
-    /**
-     * Notifies the search manager that the apps-list has changed and the search UI should be
-     * updated accordingly.
-     */
-    void refreshSearchResult();
+	/**
+	 * Notifies the search manager that the apps-list has changed and the search UI should be
+	 * updated accordingly.
+	 */
+	void refreshSearchResult();
 
-    /**
-     * Notifies the search manager to close any active search session.
-     */
-    void reset();
+	/**
+	 * Notifies the search manager to close any active search session.
+	 */
+	void reset();
 
-    /**
-     * Called before dispatching a key event, in case the search manager wants to initialize
-     * some UI beforehand.
-     */
-    void preDispatchKeyEvent(KeyEvent keyEvent);
+	/**
+	 * Called before dispatching a key event, in case the search manager wants to initialize
+	 * some UI beforehand.
+	 */
+	void preDispatchKeyEvent(KeyEvent keyEvent);
 
-    /**
-     * Starts the search UI
-     */
-    void startAppsSearch();
+	/**
+	 * Starts the search UI
+	 */
+	void startAppsSearch();
 
-    void addOnScrollRangeChangeListener(OnScrollRangeChangeListener listener);
+	void addOnScrollRangeChangeListener(OnScrollRangeChangeListener listener);
 
-    /**
-     * Callback for listening to changes in the vertical scroll range when opening all-apps.
-     */
-    interface OnScrollRangeChangeListener {
+	/**
+	 * Callback for listening to changes in the vertical scroll range when opening all-apps.
+	 */
+	interface OnScrollRangeChangeListener {
 
-        void onScrollRangeChanged(int scrollRange);
-    }
+		void onScrollRangeChanged(int scrollRange);
+	}
 }

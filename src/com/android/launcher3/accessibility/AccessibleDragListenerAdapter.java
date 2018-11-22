@@ -30,37 +30,37 @@ import com.android.launcher3.dragndrop.DragOptions;
  */
 public class AccessibleDragListenerAdapter implements DragListener {
 
-    private final ViewGroup mViewGroup;
-    private final int mDragType;
+	private final ViewGroup mViewGroup;
+	private final int mDragType;
 
-    /**
-     * @param parent
-     * @param dragType either {@link CellLayout#WORKSPACE_ACCESSIBILITY_DRAG} or
-     *                 {@link CellLayout#FOLDER_ACCESSIBILITY_DRAG}
-     */
-    public AccessibleDragListenerAdapter(ViewGroup parent, int dragType) {
-        mViewGroup = parent;
-        mDragType = dragType;
-    }
+	/**
+	 * @param parent
+	 * @param dragType either {@link CellLayout#WORKSPACE_ACCESSIBILITY_DRAG} or
+	 *                 {@link CellLayout#FOLDER_ACCESSIBILITY_DRAG}
+	 */
+	public AccessibleDragListenerAdapter(ViewGroup parent, int dragType) {
+		mViewGroup = parent;
+		mDragType = dragType;
+	}
 
-    @Override
-    public void onDragStart(DragObject dragObject, DragOptions options) {
-        enableAccessibleDrag(true);
-    }
+	@Override
+	public void onDragStart(DragObject dragObject, DragOptions options) {
+		enableAccessibleDrag(true);
+	}
 
-    @Override
-    public void onDragEnd() {
-        enableAccessibleDrag(false);
-        Launcher.getLauncher(mViewGroup.getContext()).getDragController().removeDragListener(this);
-    }
+	@Override
+	public void onDragEnd() {
+		enableAccessibleDrag(false);
+		Launcher.getLauncher(mViewGroup.getContext()).getDragController().removeDragListener(this);
+	}
 
-    protected void enableAccessibleDrag(boolean enable) {
-        for (int i = 0; i < mViewGroup.getChildCount(); i++) {
-            setEnableForLayout((CellLayout) mViewGroup.getChildAt(i), enable);
-        }
-    }
+	protected void enableAccessibleDrag(boolean enable) {
+		for (int i = 0; i < mViewGroup.getChildCount(); i++) {
+			setEnableForLayout((CellLayout) mViewGroup.getChildAt(i), enable);
+		}
+	}
 
-    protected final void setEnableForLayout(CellLayout layout, boolean enable) {
-        layout.enableAccessibleDrag(enable, mDragType);
-    }
+	protected final void setEnableForLayout(CellLayout layout, boolean enable) {
+		layout.enableAccessibleDrag(enable, mDragType);
+	}
 }

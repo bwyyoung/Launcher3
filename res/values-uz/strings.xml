@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<?xml version="1.0" encoding="UTF-8"?><!--
 /*
 * Copyright (C) 2008 The Android Open Source Project
 *
@@ -17,8 +16,7 @@
 */
  -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name" msgid="649227358658669779">"Launcher3"</string>
     <string name="folder_name" msgid="7371454440695724752"></string>
     <string name="work_folder_name" msgid="3753320833950115786">"Ishga oid"</string>
@@ -154,5 +152,5 @@
     <string name="theme_dark">Qorong‘i</string>
     <string name="theme_transparent">Shaffof</string>
     <string name="pref_open_source_licenses_title">Ochiq kodli DT litsenziyalari</string>
-    <string name="about_donate">Bag'ishlang</string>
+    <string name="about_donate">Bag\'ishlang</string>
 </resources>

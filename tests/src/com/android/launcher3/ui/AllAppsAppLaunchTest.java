@@ -24,32 +24,33 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class AllAppsAppLaunchTest extends AbstractLauncherUiTest {
 
-    @Rule public LauncherActivityRule mActivityMonitor = new LauncherActivityRule();
+	@Rule
+	public LauncherActivityRule mActivityMonitor = new LauncherActivityRule();
 
-    @Test
-    public void testAppLauncher_portrait() throws Exception {
-        lockRotation(true);
-        performTest();
-    }
+	@Test
+	public void testAppLauncher_portrait() throws Exception {
+		lockRotation(true);
+		performTest();
+	}
 
-    @Test
-    public void testAppLauncher_landscape() throws Exception {
-        lockRotation(false);
-        performTest();
-    }
+	@Test
+	public void testAppLauncher_landscape() throws Exception {
+		lockRotation(false);
+		performTest();
+	}
 
-    private void performTest() throws Exception {
-        mActivityMonitor.startLauncher();
+	private void performTest() throws Exception {
+		mActivityMonitor.startLauncher();
 
-        LauncherActivityInfo settingsApp = getSettingsApp();
+		LauncherActivityInfo settingsApp = getSettingsApp();
 
-        // Open all apps and wait for load complete
-        final UiObject2 appsContainer = openAllApps();
-        assertTrue(Wait.atMost(Condition.minChildCount(appsContainer, 2), DEFAULT_UI_TIMEOUT));
+		// Open all apps and wait for load complete
+		final UiObject2 appsContainer = openAllApps();
+		assertTrue(Wait.atMost(Condition.minChildCount(appsContainer, 2), DEFAULT_UI_TIMEOUT));
 
-        // Open settings app and verify app launched
-        scrollAndFind(appsContainer, By.text(settingsApp.getLabel().toString())).click();
-        assertTrue(mDevice.wait(Until.hasObject(By.pkg(
-                settingsApp.getComponentName().getPackageName()).depth(0)), DEFAULT_UI_TIMEOUT));
-    }
+		// Open settings app and verify app launched
+		scrollAndFind(appsContainer, By.text(settingsApp.getLabel().toString())).click();
+		assertTrue(mDevice.wait(Until.hasObject(By.pkg(
+				settingsApp.getComponentName().getPackageName()).depth(0)), DEFAULT_UI_TIMEOUT));
+	}
 }

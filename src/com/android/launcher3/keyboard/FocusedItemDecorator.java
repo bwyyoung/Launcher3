@@ -29,24 +29,24 @@ import android.view.View.OnFocusChangeListener;
  */
 public class FocusedItemDecorator extends ItemDecoration {
 
-    private FocusIndicatorHelper mHelper;
+	private FocusIndicatorHelper mHelper;
 
-    public FocusedItemDecorator(View container) {
-        mHelper = new FocusIndicatorHelper(container) {
+	public FocusedItemDecorator(View container) {
+		mHelper = new FocusIndicatorHelper(container) {
 
-            @Override
-            public void viewToRect(View v, Rect outRect) {
-                outRect.set(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
-            }
-        };
-    }
+			@Override
+			public void viewToRect(View v, Rect outRect) {
+				outRect.set(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+			}
+		};
+	}
 
-    public OnFocusChangeListener getFocusListener() {
-        return mHelper;
-    }
+	public OnFocusChangeListener getFocusListener() {
+		return mHelper;
+	}
 
-    @Override
-    public void onDraw(Canvas c, RecyclerView parent, State state) {
-        mHelper.draw(c);
-    }
+	@Override
+	public void onDraw(Canvas c, RecyclerView parent, State state) {
+		mHelper.draw(c);
+	}
 }

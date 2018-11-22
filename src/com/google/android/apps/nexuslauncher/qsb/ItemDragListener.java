@@ -14,26 +14,26 @@ import com.android.launcher3.widget.PendingAddShortcutInfo;
 import com.android.launcher3.widget.PendingItemDragHelper;
 
 public class ItemDragListener extends BaseItemDragListener {
-    private final LauncherActivityInfo mActivityInfo;
+	private final LauncherActivityInfo mActivityInfo;
 
-    public ItemDragListener(LauncherActivityInfo activityInfo, Rect rect) {
-        super(rect, rect.width(), rect.width());
-        mActivityInfo = activityInfo;
-    }
+	public ItemDragListener(LauncherActivityInfo activityInfo, Rect rect) {
+		super(rect, rect.width(), rect.width());
+		mActivityInfo = activityInfo;
+	}
 
-    protected PendingItemDragHelper createDragHelper() {
-        PendingAddShortcutInfo tag = new PendingAddShortcutInfo(new ShortcutConfigActivityInfo.ShortcutConfigActivityInfoVO(mActivityInfo) {
-            @Override
-            public ShortcutInfo createShortcutInfo() {
-                return InstallShortcutReceiver.fromActivityInfo(mActivityInfo, mLauncher);
-            }
-        });
-        View view = new View(mLauncher);
-        view.setTag(tag);
-        return new PendingItemDragHelper(view);
-    }
+	protected PendingItemDragHelper createDragHelper() {
+		PendingAddShortcutInfo tag = new PendingAddShortcutInfo(new ShortcutConfigActivityInfo.ShortcutConfigActivityInfoVO(mActivityInfo) {
+			@Override
+			public ShortcutInfo createShortcutInfo() {
+				return InstallShortcutReceiver.fromActivityInfo(mActivityInfo, mLauncher);
+			}
+		});
+		View view = new View(mLauncher);
+		view.setTag(tag);
+		return new PendingItemDragHelper(view);
+	}
 
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, LauncherLogProto.Target target, LauncherLogProto.Target targetParent) {
-    }
+	@Override
+	public void fillInLogContainerData(View v, ItemInfo info, LauncherLogProto.Target target, LauncherLogProto.Target targetParent) {
+	}
 }

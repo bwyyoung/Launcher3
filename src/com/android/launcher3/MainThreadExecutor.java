@@ -22,12 +22,12 @@ import com.android.launcher3.util.LooperExecutor;
 
 /**
  * An executor service that executes its tasks on the main thread.
- *
+ * <p>
  * Shutting down this executor is not supported.
  */
 public class MainThreadExecutor extends LooperExecutor {
 
-    public MainThreadExecutor() {
-        super(Looper.getMainLooper());
-    }
+	public MainThreadExecutor() {
+		super(Looper.getMainLooper());
+	}
 }

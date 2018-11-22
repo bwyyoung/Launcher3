@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.UserHandle;
 import android.util.ArrayMap;
 import android.util.LruCache;
+
 import java.util.List;
 
 /**
@@ -30,44 +31,44 @@ import java.util.List;
  */
 @TargetApi(Build.VERSION_CODES.N)
 public class ShortcutCache {
-    private static final int CACHE_SIZE = 30; // Max number shortcuts we cache.
+	private static final int CACHE_SIZE = 30; // Max number shortcuts we cache.
 
-    private final LruCache<ShortcutKey, ShortcutInfoCompat> mCachedShortcuts;
-    // We always keep pinned shortcuts in the cache.
-    private final ArrayMap<ShortcutKey, ShortcutInfoCompat> mPinnedShortcuts;
+	private final LruCache<ShortcutKey, ShortcutInfoCompat> mCachedShortcuts;
+	// We always keep pinned shortcuts in the cache.
+	private final ArrayMap<ShortcutKey, ShortcutInfoCompat> mPinnedShortcuts;
 
-    public ShortcutCache() {
-        mCachedShortcuts = new LruCache<>(CACHE_SIZE);
-        mPinnedShortcuts = new ArrayMap<>();
-    }
+	public ShortcutCache() {
+		mCachedShortcuts = new LruCache<>(CACHE_SIZE);
+		mPinnedShortcuts = new ArrayMap<>();
+	}
 
-    /**
-     * Removes shortcuts from the cache when shortcuts change for a given package.
-     *
-     * Returns a map of ids to their evicted shortcuts.
-     *
-     * @see android.content.pm.LauncherApps.Callback#onShortcutsChanged(String, List, UserHandle).
-     */
-    public void removeShortcuts(List<ShortcutInfoCompat> shortcuts) {
-        for (ShortcutInfoCompat shortcut : shortcuts) {
-            ShortcutKey key = ShortcutKey.fromInfo(shortcut);
-            mCachedShortcuts.remove(key);
-            mPinnedShortcuts.remove(key);
-        }
-    }
+	/**
+	 * Removes shortcuts from the cache when shortcuts change for a given package.
+	 * <p>
+	 * Returns a map of ids to their evicted shortcuts.
+	 *
+	 * @see android.content.pm.LauncherApps.Callback#onShortcutsChanged(String, List, UserHandle).
+	 */
+	public void removeShortcuts(List<ShortcutInfoCompat> shortcuts) {
+		for (ShortcutInfoCompat shortcut : shortcuts) {
+			ShortcutKey key = ShortcutKey.fromInfo(shortcut);
+			mCachedShortcuts.remove(key);
+			mPinnedShortcuts.remove(key);
+		}
+	}
 
-    public ShortcutInfoCompat get(ShortcutKey key) {
-        if (mPinnedShortcuts.containsKey(key)) {
-            return mPinnedShortcuts.get(key);
-        }
-        return mCachedShortcuts.get(key);
-    }
+	public ShortcutInfoCompat get(ShortcutKey key) {
+		if (mPinnedShortcuts.containsKey(key)) {
+			return mPinnedShortcuts.get(key);
+		}
+		return mCachedShortcuts.get(key);
+	}
 
-    public void put(ShortcutKey key, ShortcutInfoCompat shortcut) {
-        if (shortcut.isPinned()) {
-            mPinnedShortcuts.put(key, shortcut);
-        } else {
-            mCachedShortcuts.put(key, shortcut);
-        }
-    }
+	public void put(ShortcutKey key, ShortcutInfoCompat shortcut) {
+		if (shortcut.isPinned()) {
+			mPinnedShortcuts.put(key, shortcut);
+		} else {
+			mCachedShortcuts.put(key, shortcut);
+		}
+	}
 }

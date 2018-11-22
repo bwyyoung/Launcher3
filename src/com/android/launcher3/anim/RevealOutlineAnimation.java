@@ -16,75 +16,80 @@ import com.android.launcher3.Utilities;
  * animation progresses from 0 to 1.
  */
 public abstract class RevealOutlineAnimation extends ViewOutlineProvider {
-    protected Rect mOutline;
-    protected float mOutlineRadius;
+	protected Rect mOutline;
+	protected float mOutlineRadius;
 
-    public RevealOutlineAnimation() {
-        mOutline = new Rect();
-    }
+	public RevealOutlineAnimation() {
+		mOutline = new Rect();
+	}
 
-    /** Returns whether elevation should be removed for the duration of the reveal animation. */
-    abstract boolean shouldRemoveElevationDuringAnimation();
-    /** Sets the progress, from 0 to 1, of the reveal animation. */
-    abstract void setProgress(float progress);
+	/**
+	 * Returns whether elevation should be removed for the duration of the reveal animation.
+	 */
+	abstract boolean shouldRemoveElevationDuringAnimation();
 
-    public ValueAnimator createRevealAnimator(final View revealView) {
-        return createRevealAnimator(revealView, false);
-    }
+	/**
+	 * Sets the progress, from 0 to 1, of the reveal animation.
+	 */
+	abstract void setProgress(float progress);
 
-    public ValueAnimator createRevealAnimator(final View revealView, boolean isReversed) {
-        ValueAnimator va =
-                isReversed ? ValueAnimator.ofFloat(1f, 0f) : ValueAnimator.ofFloat(0f, 1f);
-        final float elevation = revealView.getElevation();
+	public ValueAnimator createRevealAnimator(final View revealView) {
+		return createRevealAnimator(revealView, false);
+	}
 
-        va.addListener(new AnimatorListenerAdapter() {
-            private boolean mWasCanceled = false;
+	public ValueAnimator createRevealAnimator(final View revealView, boolean isReversed) {
+		ValueAnimator va =
+				isReversed ? ValueAnimator.ofFloat(1f, 0f) : ValueAnimator.ofFloat(0f, 1f);
+		final float elevation = revealView.getElevation();
 
-            public void onAnimationStart(Animator animation) {
-                revealView.setOutlineProvider(RevealOutlineAnimation.this);
-                revealView.setClipToOutline(true);
-                if (shouldRemoveElevationDuringAnimation()) {
-                    revealView.setTranslationZ(-elevation);
-                }
-            }
+		va.addListener(new AnimatorListenerAdapter() {
+			private boolean mWasCanceled = false;
 
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                mWasCanceled = true;
-            }
+			public void onAnimationStart(Animator animation) {
+				revealView.setOutlineProvider(RevealOutlineAnimation.this);
+				revealView.setClipToOutline(true);
+				if (shouldRemoveElevationDuringAnimation()) {
+					revealView.setTranslationZ(-elevation);
+				}
+			}
 
-            public void onAnimationEnd(Animator animation) {
-                if (!mWasCanceled) {
-                    revealView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
-                    revealView.setClipToOutline(false);
-                    if (shouldRemoveElevationDuringAnimation()) {
-                        revealView.setTranslationZ(0);
-                    }
-                }
-            }
+			@Override
+			public void onAnimationCancel(Animator animation) {
+				mWasCanceled = true;
+			}
 
-        });
+			public void onAnimationEnd(Animator animation) {
+				if (!mWasCanceled) {
+					revealView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+					revealView.setClipToOutline(false);
+					if (shouldRemoveElevationDuringAnimation()) {
+						revealView.setTranslationZ(0);
+					}
+				}
+			}
 
-        va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator arg0) {
-                float progress = (Float) arg0.getAnimatedValue();
-                setProgress(progress);
-                revealView.invalidateOutline();
-                if (!Utilities.ATLEAST_LOLLIPOP_MR1) {
-                    revealView.invalidate();
-                }
-            }
-        });
-        return va;
-    }
+		});
 
-    @Override
-    public void getOutline(View v, Outline outline) {
-        outline.setRoundRect(mOutline, mOutlineRadius);
-    }
+		va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator arg0) {
+				float progress = (Float) arg0.getAnimatedValue();
+				setProgress(progress);
+				revealView.invalidateOutline();
+				if (!Utilities.ATLEAST_LOLLIPOP_MR1) {
+					revealView.invalidate();
+				}
+			}
+		});
+		return va;
+	}
 
-    public float getRadius() {
-        return mOutlineRadius;
-    }
+	@Override
+	public void getOutline(View v, Outline outline) {
+		outline.setRoundRect(mOutline, mOutlineRadius);
+	}
+
+	public float getRadius() {
+		return mOutlineRadius;
+	}
 }

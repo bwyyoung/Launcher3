@@ -42,129 +42,130 @@ import java.util.List;
  */
 public class PackageManagerHelper {
 
-    private final Context mContext;
-    private final PackageManager mPm;
-    private final LauncherAppsCompat mLauncherApps;
+	private final Context mContext;
+	private final PackageManager mPm;
+	private final LauncherAppsCompat mLauncherApps;
 
-    public PackageManagerHelper(Context context) {
-        mContext = context;
-        mPm = context.getPackageManager();
-        mLauncherApps = LauncherAppsCompat.getInstance(context);
-    }
+	public PackageManagerHelper(Context context) {
+		mContext = context;
+		mPm = context.getPackageManager();
+		mLauncherApps = LauncherAppsCompat.getInstance(context);
+	}
 
-    /**
-     * Returns true if the app can possibly be on the SDCard. This is just a workaround and doesn't
-     * guarantee that the app is on SD card.
-     */
-    public boolean isAppOnSdcard(String packageName, UserHandle user) {
-        ApplicationInfo info = mLauncherApps.getApplicationInfo(
-                packageName, PackageManager.MATCH_UNINSTALLED_PACKAGES, user);
-        return info != null && (info.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0;
-    }
+	/**
+	 * Returns true if the app can possibly be on the SDCard. This is just a workaround and doesn't
+	 * guarantee that the app is on SD card.
+	 */
+	public boolean isAppOnSdcard(String packageName, UserHandle user) {
+		ApplicationInfo info = mLauncherApps.getApplicationInfo(
+				packageName, PackageManager.MATCH_UNINSTALLED_PACKAGES, user);
+		return info != null && (info.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0;
+	}
 
-    /**
-     * Returns whether the target app is suspended for a given user as per
-     * {@link android.app.admin.DevicePolicyManager#isPackageSuspended}.
-     */
-    public boolean isAppSuspended(String packageName, UserHandle user) {
-        ApplicationInfo info = mLauncherApps.getApplicationInfo(packageName, 0, user);
-        return info != null && isAppSuspended(info);
-    }
+	/**
+	 * Returns whether the target app is suspended for a given user as per
+	 * {@link android.app.admin.DevicePolicyManager#isPackageSuspended}.
+	 */
+	public boolean isAppSuspended(String packageName, UserHandle user) {
+		ApplicationInfo info = mLauncherApps.getApplicationInfo(packageName, 0, user);
+		return info != null && isAppSuspended(info);
+	}
 
-    public boolean isSafeMode() {
-        return mContext.getPackageManager().isSafeMode();
-    }
+	public boolean isSafeMode() {
+		return mContext.getPackageManager().isSafeMode();
+	}
 
-    public Intent getAppLaunchIntent(String pkg, UserHandle user) {
-        List<LauncherActivityInfo> activities = mLauncherApps.getActivityList(pkg, user);
-        return activities.isEmpty() ? null :
-                AppInfo.makeLaunchIntent(activities.get(0));
-    }
+	public Intent getAppLaunchIntent(String pkg, UserHandle user) {
+		List<LauncherActivityInfo> activities = mLauncherApps.getActivityList(pkg, user);
+		return activities.isEmpty() ? null :
+				AppInfo.makeLaunchIntent(activities.get(0));
+	}
 
-    /**
-     * Returns whether an application is suspended as per
-     * {@link android.app.admin.DevicePolicyManager#isPackageSuspended}.
-     */
-    public static boolean isAppSuspended(ApplicationInfo info) {
-        // The value of FLAG_SUSPENDED was reused by a hidden constant
-        // ApplicationInfo.FLAG_PRIVILEGED prior to N, so only check for suspended flag on N
-        // or later.
-        if (Utilities.ATLEAST_NOUGAT) {
-            return (info.flags & ApplicationInfo.FLAG_SUSPENDED) != 0;
-        } else {
-            return false;
-        }
-    }
+	/**
+	 * Returns whether an application is suspended as per
+	 * {@link android.app.admin.DevicePolicyManager#isPackageSuspended}.
+	 */
+	public static boolean isAppSuspended(ApplicationInfo info) {
+		// The value of FLAG_SUSPENDED was reused by a hidden constant
+		// ApplicationInfo.FLAG_PRIVILEGED prior to N, so only check for suspended flag on N
+		// or later.
+		if (Utilities.ATLEAST_NOUGAT) {
+			return (info.flags & ApplicationInfo.FLAG_SUSPENDED) != 0;
+		} else {
+			return false;
+		}
+	}
 
-    /**
-     * Returns true if {@param srcPackage} has the permission required to start the activity from
-     * {@param intent}. If {@param srcPackage} is null, then the activity should not need
-     * any permissions
-     */
-    public boolean hasPermissionForActivity(Intent intent, String srcPackage) {
-        ResolveInfo target = mPm.resolveActivity(intent, 0);
-        if (target == null) {
-            // Not a valid target
-            return false;
-        }
-        if (TextUtils.isEmpty(target.activityInfo.permission)) {
-            // No permission is needed
-            return true;
-        }
-        if (TextUtils.isEmpty(srcPackage)) {
-            // The activity requires some permission but there is no source.
-            return false;
-        }
+	/**
+	 * Returns true if {@param srcPackage} has the permission required to start the activity from
+	 * {@param intent}. If {@param srcPackage} is null, then the activity should not need
+	 * any permissions
+	 */
+	public boolean hasPermissionForActivity(Intent intent, String srcPackage) {
+		ResolveInfo target = mPm.resolveActivity(intent, 0);
+		if (target == null) {
+			// Not a valid target
+			return false;
+		}
+		if (TextUtils.isEmpty(target.activityInfo.permission)) {
+			// No permission is needed
+			return true;
+		}
+		if (TextUtils.isEmpty(srcPackage)) {
+			// The activity requires some permission but there is no source.
+			return false;
+		}
 
-        // Source does not have sufficient permissions.
-        if(mPm.checkPermission(target.activityInfo.permission, srcPackage) !=
-                PackageManager.PERMISSION_GRANTED) {
-            return false;
-        }
+		// Source does not have sufficient permissions.
+		if (mPm.checkPermission(target.activityInfo.permission, srcPackage) !=
+				PackageManager.PERMISSION_GRANTED) {
+			return false;
+		}
 
-        if (!Utilities.ATLEAST_MARSHMALLOW) {
-            // These checks are sufficient for below M devices.
-            return true;
-        }
+		if (!Utilities.ATLEAST_MARSHMALLOW) {
+			// These checks are sufficient for below M devices.
+			return true;
+		}
 
-        // On M and above also check AppOpsManager for compatibility mode permissions.
-        if (TextUtils.isEmpty(AppOpsManager.permissionToOp(target.activityInfo.permission))) {
-            // There is no app-op for this permission, which could have been disabled.
-            return true;
-        }
+		// On M and above also check AppOpsManager for compatibility mode permissions.
+		if (TextUtils.isEmpty(AppOpsManager.permissionToOp(target.activityInfo.permission))) {
+			// There is no app-op for this permission, which could have been disabled.
+			return true;
+		}
 
-        // There is no direct way to check if the app-op is allowed for a particular app. Since
-        // app-op is only enabled for apps running in compatibility mode, simply block such apps.
+		// There is no direct way to check if the app-op is allowed for a particular app. Since
+		// app-op is only enabled for apps running in compatibility mode, simply block such apps.
 
-        try {
-            return mPm.getApplicationInfo(srcPackage, 0).targetSdkVersion >= Build.VERSION_CODES.M;
-        } catch (NameNotFoundException e) { }
+		try {
+			return mPm.getApplicationInfo(srcPackage, 0).targetSdkVersion >= Build.VERSION_CODES.M;
+		} catch (NameNotFoundException e) {
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    public static Intent getMarketIntent(String packageName) {
-        return new Intent(Intent.ACTION_VIEW)
-                .setData(new Uri.Builder()
-                        .scheme("market")
-                        .authority("details")
-                        .appendQueryParameter("id", packageName)
-                        .build());
-    }
+	public static Intent getMarketIntent(String packageName) {
+		return new Intent(Intent.ACTION_VIEW)
+				.setData(new Uri.Builder()
+						.scheme("market")
+						.authority("details")
+						.appendQueryParameter("id", packageName)
+						.build());
+	}
 
-    /**
-     * Creates a new market search intent.
-     */
-    public static Intent getMarketSearchIntent(Context context, String query) {
-        try {
-            Intent intent = Intent.parseUri(context.getString(R.string.market_search_intent), 0);
-            if (!TextUtils.isEmpty(query)) {
-                intent.setData(
-                        intent.getData().buildUpon().appendQueryParameter("q", query).build());
-            }
-            return intent;
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	/**
+	 * Creates a new market search intent.
+	 */
+	public static Intent getMarketSearchIntent(Context context, String query) {
+		try {
+			Intent intent = Intent.parseUri(context.getString(R.string.market_search_intent), 0);
+			if (!TextUtils.isEmpty(query)) {
+				intent.setData(
+						intent.getData().buildUpon().appendQueryParameter("q", query).build());
+			}
+			return intent;
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

@@ -19,6 +19,7 @@ package com.android.launcher3.dragndrop;
 import android.content.Context;
 import android.view.DragEvent;
 import android.view.MotionEvent;
+
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.Utilities;
 
@@ -26,69 +27,73 @@ import com.android.launcher3.Utilities;
  * Base class for driving a drag/drop operation.
  */
 public abstract class DragDriver {
-    protected final EventListener mEventListener;
+	protected final EventListener mEventListener;
 
-    public interface EventListener {
-        void onDriverDragMove(float x, float y);
-        void onDriverDragExitWindow();
-        void onDriverDragEnd(float x, float y);
-        void onDriverDragCancel();
-    }
+	public interface EventListener {
+		void onDriverDragMove(float x, float y);
 
-    public DragDriver(EventListener eventListener) {
-        mEventListener = eventListener;
-    }
+		void onDriverDragExitWindow();
 
-    /**
-     * Handles ending of the DragView animation.
-     */
-    public void onDragViewAnimationEnd() { }
+		void onDriverDragEnd(float x, float y);
 
-    public boolean onTouchEvent(MotionEvent ev) {
-        final int action = ev.getAction();
+		void onDriverDragCancel();
+	}
 
-        switch (action) {
-            case MotionEvent.ACTION_MOVE:
-                mEventListener.onDriverDragMove(ev.getX(), ev.getY());
-                break;
-            case MotionEvent.ACTION_UP:
-                mEventListener.onDriverDragMove(ev.getX(), ev.getY());
-                mEventListener.onDriverDragEnd(ev.getX(), ev.getY());
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                mEventListener.onDriverDragCancel();
-                break;
-        }
+	public DragDriver(EventListener eventListener) {
+		mEventListener = eventListener;
+	}
 
-        return true;
-    }
+	/**
+	 * Handles ending of the DragView animation.
+	 */
+	public void onDragViewAnimationEnd() {
+	}
 
-    public abstract boolean onDragEvent (DragEvent event);
+	public boolean onTouchEvent(MotionEvent ev) {
+		final int action = ev.getAction();
+
+		switch (action) {
+			case MotionEvent.ACTION_MOVE:
+				mEventListener.onDriverDragMove(ev.getX(), ev.getY());
+				break;
+			case MotionEvent.ACTION_UP:
+				mEventListener.onDriverDragMove(ev.getX(), ev.getY());
+				mEventListener.onDriverDragEnd(ev.getX(), ev.getY());
+				break;
+			case MotionEvent.ACTION_CANCEL:
+				mEventListener.onDriverDragCancel();
+				break;
+		}
+
+		return true;
+	}
+
+	public abstract boolean onDragEvent(DragEvent event);
 
 
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        final int action = ev.getAction();
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		final int action = ev.getAction();
 
-        switch (action) {
-            case MotionEvent.ACTION_UP:
-                mEventListener.onDriverDragEnd(ev.getX(), ev.getY());
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                mEventListener.onDriverDragCancel();
-                break;
-        }
+		switch (action) {
+			case MotionEvent.ACTION_UP:
+				mEventListener.onDriverDragEnd(ev.getX(), ev.getY());
+				break;
+			case MotionEvent.ACTION_CANCEL:
+				mEventListener.onDriverDragCancel();
+				break;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    public static DragDriver create(Context context, DragController dragController,
-            DragObject dragObject, DragOptions options) {
-        if (Utilities.ATLEAST_NOUGAT && options.systemDndStartPoint != null) {
-            return new SystemDragDriver(dragController, context, dragObject);
-        } else {
-            return new InternalDragDriver(dragController);
-        }
-    }
+	public static DragDriver create(Context context, DragController dragController,
+									DragObject dragObject, DragOptions options) {
+		if (Utilities.ATLEAST_NOUGAT && options.systemDndStartPoint != null) {
+			return new SystemDragDriver(dragController, context, dragObject);
+		} else {
+			return new InternalDragDriver(dragController);
+		}
+	}
 }
 
 /**
@@ -96,70 +101,72 @@ public abstract class DragDriver {
  */
 class SystemDragDriver extends DragDriver {
 
-    float mLastX = 0;
-    float mLastY = 0;
+	float mLastX = 0;
+	float mLastY = 0;
 
-    SystemDragDriver(DragController dragController, Context context, DragObject dragObject) {
-        super(dragController);
-    }
+	SystemDragDriver(DragController dragController, Context context, DragObject dragObject) {
+		super(dragController);
+	}
 
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        return false;
-    }
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		return false;
+	}
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return false;
-    }
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		return false;
+	}
 
-    @Override
-    public boolean onDragEvent (DragEvent event) {
-        final int action = event.getAction();
+	@Override
+	public boolean onDragEvent(DragEvent event) {
+		final int action = event.getAction();
 
-        switch (action) {
-            case DragEvent.ACTION_DRAG_STARTED:
-                mLastX = event.getX();
-                mLastY = event.getY();
-                return true;
+		switch (action) {
+			case DragEvent.ACTION_DRAG_STARTED:
+				mLastX = event.getX();
+				mLastY = event.getY();
+				return true;
 
-            case DragEvent.ACTION_DRAG_ENTERED:
-                return true;
+			case DragEvent.ACTION_DRAG_ENTERED:
+				return true;
 
-            case DragEvent.ACTION_DRAG_LOCATION:
-                mLastX = event.getX();
-                mLastY = event.getY();
-                mEventListener.onDriverDragMove(event.getX(), event.getY());
-                return true;
+			case DragEvent.ACTION_DRAG_LOCATION:
+				mLastX = event.getX();
+				mLastY = event.getY();
+				mEventListener.onDriverDragMove(event.getX(), event.getY());
+				return true;
 
-            case DragEvent.ACTION_DROP:
-                mLastX = event.getX();
-                mLastY = event.getY();
-                mEventListener.onDriverDragMove(event.getX(), event.getY());
-                mEventListener.onDriverDragEnd(mLastX, mLastY);
-                return true;
-            case DragEvent.ACTION_DRAG_EXITED:
-                mEventListener.onDriverDragExitWindow();
-                return true;
+			case DragEvent.ACTION_DROP:
+				mLastX = event.getX();
+				mLastY = event.getY();
+				mEventListener.onDriverDragMove(event.getX(), event.getY());
+				mEventListener.onDriverDragEnd(mLastX, mLastY);
+				return true;
+			case DragEvent.ACTION_DRAG_EXITED:
+				mEventListener.onDriverDragExitWindow();
+				return true;
 
-            case DragEvent.ACTION_DRAG_ENDED:
-                mEventListener.onDriverDragCancel();
-                return true;
+			case DragEvent.ACTION_DRAG_ENDED:
+				mEventListener.onDriverDragCancel();
+				return true;
 
-            default:
-                return false;
-        }
-    }
+			default:
+				return false;
+		}
+	}
 }
 
 /**
  * Class for driving an internal (i.e. not using framework) drag/drop operation.
  */
 class InternalDragDriver extends DragDriver {
-    InternalDragDriver(DragController dragController) {
-        super(dragController);
-    }
+	InternalDragDriver(DragController dragController) {
+		super(dragController);
+	}
 
-    @Override
-    public boolean onDragEvent (DragEvent event) { return false; }
+	@Override
+	public boolean onDragEvent(DragEvent event) {
+		return false;
+	}
 }

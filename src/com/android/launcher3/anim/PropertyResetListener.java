@@ -26,16 +26,16 @@ import android.util.Property;
  */
 public class PropertyResetListener<T, V> extends AnimatorListenerAdapter {
 
-    private Property<T, V> mPropertyToReset;
-    private V mResetToValue;
+	private Property<T, V> mPropertyToReset;
+	private V mResetToValue;
 
-    public PropertyResetListener(Property<T, V> propertyToReset, V resetToValue) {
-        mPropertyToReset = propertyToReset;
-        mResetToValue = resetToValue;
-    }
+	public PropertyResetListener(Property<T, V> propertyToReset, V resetToValue) {
+		mPropertyToReset = propertyToReset;
+		mResetToValue = resetToValue;
+	}
 
-    @Override
-    public void onAnimationEnd(Animator animation) {
-        mPropertyToReset.set((T) ((ObjectAnimator) animation).getTarget(), mResetToValue);
-    }
+	@Override
+	public void onAnimationEnd(Animator animation) {
+		mPropertyToReset.set((T) ((ObjectAnimator) animation).getTarget(), mResetToValue);
+	}
 }

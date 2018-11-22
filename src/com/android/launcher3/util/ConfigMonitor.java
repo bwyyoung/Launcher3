@@ -2,13 +2,13 @@ package com.android.launcher3.util;
 
 /**
  * Copyright (C) 2015 The Android Open Source Project
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,29 +29,29 @@ import android.util.Log;
  */
 public class ConfigMonitor extends BroadcastReceiver {
 
-    private final Context mContext;
-    private final float mFontScale;
-    private final int mDensity;
+	private final Context mContext;
+	private final float mFontScale;
+	private final int mDensity;
 
-    public ConfigMonitor(Context context) {
-        mContext = context;
+	public ConfigMonitor(Context context) {
+		mContext = context;
 
-        Configuration config = context.getResources().getConfiguration();
-        mFontScale = config.fontScale;
-        mDensity = config.densityDpi;
-    }
+		Configuration config = context.getResources().getConfiguration();
+		mFontScale = config.fontScale;
+		mDensity = config.densityDpi;
+	}
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Configuration config = context.getResources().getConfiguration();
-        if (mFontScale != config.fontScale || mDensity != config.densityDpi) {
-            Log.d("ConfigMonitor", "Configuration changed, restarting launcher");
-            mContext.unregisterReceiver(this);
-            android.os.Process.killProcess(android.os.Process.myPid());
-        }
-    }
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		Configuration config = context.getResources().getConfiguration();
+		if (mFontScale != config.fontScale || mDensity != config.densityDpi) {
+			Log.d("ConfigMonitor", "Configuration changed, restarting launcher");
+			mContext.unregisterReceiver(this);
+			android.os.Process.killProcess(android.os.Process.myPid());
+		}
+	}
 
-    public void register() {
-        mContext.registerReceiver(this, new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
-    }
+	public void register() {
+		mContext.registerReceiver(this, new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
+	}
 }

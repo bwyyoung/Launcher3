@@ -37,73 +37,73 @@ import java.util.List;
 
 class AppWidgetManagerCompatVL extends AppWidgetManagerCompat {
 
-    private final UserManager mUserManager;
+	private final UserManager mUserManager;
 
-    AppWidgetManagerCompatVL(Context context) {
-        super(context);
-        mUserManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-    }
+	AppWidgetManagerCompatVL(Context context) {
+		super(context);
+		mUserManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+	}
 
-    @Override
-    public List<AppWidgetProviderInfo> getAllProviders(@Nullable PackageUserKey packageUser) {
-        if (FeatureFlags.GO_DISABLE_WIDGETS) {
-            return Collections.emptyList();
-        }
-        if (packageUser == null) {
-            ArrayList<AppWidgetProviderInfo> providers = new ArrayList<AppWidgetProviderInfo>();
-            for (UserHandle user : mUserManager.getUserProfiles()) {
-                providers.addAll(mAppWidgetManager.getInstalledProvidersForProfile(user));
-            }
-            return providers;
-        }
-        // Only get providers for the given package/user.
-        List<AppWidgetProviderInfo> providers = new ArrayList<>(mAppWidgetManager
-                .getInstalledProvidersForProfile(packageUser.mUser));
-        Iterator<AppWidgetProviderInfo> iterator = providers.iterator();
-        while (iterator.hasNext()) {
-            if (!iterator.next().provider.getPackageName().equals(packageUser.mPackageName)) {
-                iterator.remove();
-            }
-        }
-        return providers;
-    }
+	@Override
+	public List<AppWidgetProviderInfo> getAllProviders(@Nullable PackageUserKey packageUser) {
+		if (FeatureFlags.GO_DISABLE_WIDGETS) {
+			return Collections.emptyList();
+		}
+		if (packageUser == null) {
+			ArrayList<AppWidgetProviderInfo> providers = new ArrayList<AppWidgetProviderInfo>();
+			for (UserHandle user : mUserManager.getUserProfiles()) {
+				providers.addAll(mAppWidgetManager.getInstalledProvidersForProfile(user));
+			}
+			return providers;
+		}
+		// Only get providers for the given package/user.
+		List<AppWidgetProviderInfo> providers = new ArrayList<>(mAppWidgetManager
+				.getInstalledProvidersForProfile(packageUser.mUser));
+		Iterator<AppWidgetProviderInfo> iterator = providers.iterator();
+		while (iterator.hasNext()) {
+			if (!iterator.next().provider.getPackageName().equals(packageUser.mPackageName)) {
+				iterator.remove();
+			}
+		}
+		return providers;
+	}
 
-    @Override
-    public boolean bindAppWidgetIdIfAllowed(int appWidgetId, AppWidgetProviderInfo info,
-            Bundle options) {
-        if (FeatureFlags.GO_DISABLE_WIDGETS) {
-            return false;
-        }
-        return mAppWidgetManager.bindAppWidgetIdIfAllowed(
-                appWidgetId, info.getProfile(), info.provider, options);
-    }
+	@Override
+	public boolean bindAppWidgetIdIfAllowed(int appWidgetId, AppWidgetProviderInfo info,
+											Bundle options) {
+		if (FeatureFlags.GO_DISABLE_WIDGETS) {
+			return false;
+		}
+		return mAppWidgetManager.bindAppWidgetIdIfAllowed(
+				appWidgetId, info.getProfile(), info.provider, options);
+	}
 
-    @Override
-    public LauncherAppWidgetProviderInfo findProvider(ComponentName provider, UserHandle user) {
-        if (FeatureFlags.GO_DISABLE_WIDGETS) {
-            return null;
-        }
-        for (AppWidgetProviderInfo info :
-                getAllProviders(new PackageUserKey(provider.getPackageName(), user))) {
-            if (info.provider.equals(provider)) {
-                return LauncherAppWidgetProviderInfo.fromProviderInfo(mContext, info);
-            }
-        }
-        return null;
-    }
+	@Override
+	public LauncherAppWidgetProviderInfo findProvider(ComponentName provider, UserHandle user) {
+		if (FeatureFlags.GO_DISABLE_WIDGETS) {
+			return null;
+		}
+		for (AppWidgetProviderInfo info :
+				getAllProviders(new PackageUserKey(provider.getPackageName(), user))) {
+			if (info.provider.equals(provider)) {
+				return LauncherAppWidgetProviderInfo.fromProviderInfo(mContext, info);
+			}
+		}
+		return null;
+	}
 
-    @Override
-    public HashMap<ComponentKey, AppWidgetProviderInfo> getAllProvidersMap() {
-        HashMap<ComponentKey, AppWidgetProviderInfo> result = new HashMap<>();
-        if (FeatureFlags.GO_DISABLE_WIDGETS) {
-            return result;
-        }
-        for (UserHandle user : mUserManager.getUserProfiles()) {
-            for (AppWidgetProviderInfo info :
-                    mAppWidgetManager.getInstalledProvidersForProfile(user)) {
-                result.put(new ComponentKey(info.provider, user), info);
-            }
-        }
-        return result;
-    }
+	@Override
+	public HashMap<ComponentKey, AppWidgetProviderInfo> getAllProvidersMap() {
+		HashMap<ComponentKey, AppWidgetProviderInfo> result = new HashMap<>();
+		if (FeatureFlags.GO_DISABLE_WIDGETS) {
+			return result;
+		}
+		for (UserHandle user : mUserManager.getUserProfiles()) {
+			for (AppWidgetProviderInfo info :
+					mAppWidgetManager.getInstalledProvidersForProfile(user)) {
+				result.put(new ComponentKey(info.provider, user), info);
+			}
+		}
+		return result;
+	}
 }

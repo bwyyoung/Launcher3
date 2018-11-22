@@ -33,55 +33,55 @@ import java.util.Map.Entry;
 
 /**
  * Helper class to re-query app status when SD-card becomes available.
- *
+ * <p>
  * During first load, just after reboot, some apps on sdcard might not be available immediately due
  * to some race conditions in the system. We wait for ACTION_BOOT_COMPLETED and process such
  * apps again.
  */
 public class SdCardAvailableReceiver extends BroadcastReceiver {
 
-    private final LauncherModel mModel;
-    private final Context mContext;
-    private final MultiHashMap<UserHandle, String> mPackages;
+	private final LauncherModel mModel;
+	private final Context mContext;
+	private final MultiHashMap<UserHandle, String> mPackages;
 
-    public SdCardAvailableReceiver(LauncherAppState app,
-            MultiHashMap<UserHandle, String> packages) {
-        mModel = app.getModel();
-        mContext = app.getContext();
-        mPackages = packages;
-    }
+	public SdCardAvailableReceiver(LauncherAppState app,
+								   MultiHashMap<UserHandle, String> packages) {
+		mModel = app.getModel();
+		mContext = app.getContext();
+		mPackages = packages;
+	}
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        final LauncherAppsCompat launcherApps = LauncherAppsCompat.getInstance(context);
-        final PackageManagerHelper pmHelper = new PackageManagerHelper(context);
-        for (Entry<UserHandle, ArrayList<String>> entry : mPackages.entrySet()) {
-            UserHandle user = entry.getKey();
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		final LauncherAppsCompat launcherApps = LauncherAppsCompat.getInstance(context);
+		final PackageManagerHelper pmHelper = new PackageManagerHelper(context);
+		for (Entry<UserHandle, ArrayList<String>> entry : mPackages.entrySet()) {
+			UserHandle user = entry.getKey();
 
-            final ArrayList<String> packagesRemoved = new ArrayList<>();
-            final ArrayList<String> packagesUnavailable = new ArrayList<>();
+			final ArrayList<String> packagesRemoved = new ArrayList<>();
+			final ArrayList<String> packagesUnavailable = new ArrayList<>();
 
-            for (String pkg : new HashSet<>(entry.getValue())) {
-                if (!launcherApps.isPackageEnabledForProfile(pkg, user)) {
-                    if (pmHelper.isAppOnSdcard(pkg, user)) {
-                        packagesUnavailable.add(pkg);
-                    } else {
-                        packagesRemoved.add(pkg);
-                    }
-                }
-            }
-            if (!packagesRemoved.isEmpty()) {
-                mModel.onPackagesRemoved(user,
-                        packagesRemoved.toArray(new String[packagesRemoved.size()]));
-            }
-            if (!packagesUnavailable.isEmpty()) {
-                mModel.onPackagesUnavailable(
-                        packagesUnavailable.toArray(new String[packagesUnavailable.size()]),
-                        user, false);
-            }
-        }
+			for (String pkg : new HashSet<>(entry.getValue())) {
+				if (!launcherApps.isPackageEnabledForProfile(pkg, user)) {
+					if (pmHelper.isAppOnSdcard(pkg, user)) {
+						packagesUnavailable.add(pkg);
+					} else {
+						packagesRemoved.add(pkg);
+					}
+				}
+			}
+			if (!packagesRemoved.isEmpty()) {
+				mModel.onPackagesRemoved(user,
+						packagesRemoved.toArray(new String[packagesRemoved.size()]));
+			}
+			if (!packagesUnavailable.isEmpty()) {
+				mModel.onPackagesUnavailable(
+						packagesUnavailable.toArray(new String[packagesUnavailable.size()]),
+						user, false);
+			}
+		}
 
-        // Unregister the broadcast receiver, just in case
-        mContext.unregisterReceiver(this);
-    }
+		// Unregister the broadcast receiver, just in case
+		mContext.unregisterReceiver(this);
+	}
 }

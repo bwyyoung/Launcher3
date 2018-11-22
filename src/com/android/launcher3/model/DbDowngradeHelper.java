@@ -40,69 +40,69 @@ import java.util.Collections;
  */
 public class DbDowngradeHelper {
 
-    private static final String TAG = "DbDowngradeHelper";
+	private static final String TAG = "DbDowngradeHelper";
 
-    private static final String KEY_VERSION = "version";
-    private static final String KEY_DOWNGRADE_TO = "downgrade_to_";
+	private static final String KEY_VERSION = "version";
+	private static final String KEY_DOWNGRADE_TO = "downgrade_to_";
 
-    private final SparseArray<String[]> mStatements = new SparseArray<>();
-    public final int version;
+	private final SparseArray<String[]> mStatements = new SparseArray<>();
+	public final int version;
 
-    private DbDowngradeHelper(int version) {
-        this.version = version;
-    }
+	private DbDowngradeHelper(int version) {
+		this.version = version;
+	}
 
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        ArrayList<String> allCommands = new ArrayList<>();
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		ArrayList<String> allCommands = new ArrayList<>();
 
-        for (int i = oldVersion - 1; i >= newVersion; i--) {
-            String[] commands = mStatements.get(i);
-            if (commands == null) {
-                throw new SQLiteException("Downgrade path not supported to version " + i);
-            }
-            Collections.addAll(allCommands, commands);
-        }
+		for (int i = oldVersion - 1; i >= newVersion; i--) {
+			String[] commands = mStatements.get(i);
+			if (commands == null) {
+				throw new SQLiteException("Downgrade path not supported to version " + i);
+			}
+			Collections.addAll(allCommands, commands);
+		}
 
-        try (SQLiteTransaction t = new SQLiteTransaction(db)) {
-            for (String sql : allCommands) {
-                db.execSQL(sql);
-            }
-            t.commit();
-        }
-    }
+		try (SQLiteTransaction t = new SQLiteTransaction(db)) {
+			for (String sql : allCommands) {
+				db.execSQL(sql);
+			}
+			t.commit();
+		}
+	}
 
-    public static DbDowngradeHelper parse(File file) throws JSONException, IOException {
-        JSONObject obj = new JSONObject(new String(IOUtils.toByteArray(file)));
-        DbDowngradeHelper helper = new DbDowngradeHelper(obj.getInt(KEY_VERSION));
-        for (int version = helper.version - 1; version > 0; version--) {
-            if (obj.has(KEY_DOWNGRADE_TO + version)) {
-                JSONArray statements = obj.getJSONArray(KEY_DOWNGRADE_TO + version);
-                String[] parsed = new String[statements.length()];
-                for (int i = 0; i < parsed.length; i++) {
-                    parsed[i] = statements.getString(i);
-                }
-                helper.mStatements.put(version, parsed);
-            }
-        }
-        return helper;
-    }
+	public static DbDowngradeHelper parse(File file) throws JSONException, IOException {
+		JSONObject obj = new JSONObject(new String(IOUtils.toByteArray(file)));
+		DbDowngradeHelper helper = new DbDowngradeHelper(obj.getInt(KEY_VERSION));
+		for (int version = helper.version - 1; version > 0; version--) {
+			if (obj.has(KEY_DOWNGRADE_TO + version)) {
+				JSONArray statements = obj.getJSONArray(KEY_DOWNGRADE_TO + version);
+				String[] parsed = new String[statements.length()];
+				for (int i = 0; i < parsed.length; i++) {
+					parsed[i] = statements.getString(i);
+				}
+				helper.mStatements.put(version, parsed);
+			}
+		}
+		return helper;
+	}
 
-    public static void updateSchemaFile(File schemaFile, int expectedVersion,
-            Context context, int schemaResId) {
-        try {
-            if (DbDowngradeHelper.parse(schemaFile).version >= expectedVersion) {
-                return;
-            }
-        } catch (Exception e) {
-            // Schema error
-        }
+	public static void updateSchemaFile(File schemaFile, int expectedVersion,
+										Context context, int schemaResId) {
+		try {
+			if (DbDowngradeHelper.parse(schemaFile).version >= expectedVersion) {
+				return;
+			}
+		} catch (Exception e) {
+			// Schema error
+		}
 
-        // Write the updated schema
-        try (FileOutputStream fos = new FileOutputStream(schemaFile);
-            InputStream in = context.getResources().openRawResource(schemaResId)) {
-            IOUtils.copy(in, fos);
-        } catch (IOException e) {
-            Log.e(TAG, "Error writing schema file", e);
-        }
-    }
+		// Write the updated schema
+		try (FileOutputStream fos = new FileOutputStream(schemaFile);
+			 InputStream in = context.getResources().openRawResource(schemaResId)) {
+			IOUtils.copy(in, fos);
+		} catch (IOException e) {
+			Log.e(TAG, "Error writing schema file", e);
+		}
+	}
 }

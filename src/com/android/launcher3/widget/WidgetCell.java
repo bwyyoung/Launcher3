@@ -41,7 +41,7 @@ import com.android.launcher3.model.WidgetItem;
 /**
  * Represents the individual cell of the widget inside the widget tray. The preview is drawn
  * horizontally centered, and scaled down if needed.
- *
+ * <p>
  * This view does not support padding. Since the image is scaled down to fit the view, padding will
  * further decrease the scaling factor. Drag-n-drop uses the view bounds for showing a smooth
  * transition from the view to drag view, so when adding padding support, DnD would need to
@@ -49,176 +49,180 @@ import com.android.launcher3.model.WidgetItem;
  */
 public class WidgetCell extends LinearLayout implements OnLayoutChangeListener {
 
-    private static final String TAG = "WidgetCell";
-    private static final boolean DEBUG = false;
+	private static final String TAG = "WidgetCell";
+	private static final boolean DEBUG = false;
 
-    private static final int FADE_IN_DURATION_MS = 90;
+	private static final int FADE_IN_DURATION_MS = 90;
 
-    /** Widget cell width is calculated by multiplying this factor to grid cell width. */
-    private static final float WIDTH_SCALE = 2.6f;
+	/**
+	 * Widget cell width is calculated by multiplying this factor to grid cell width.
+	 */
+	private static final float WIDTH_SCALE = 2.6f;
 
-    /** Widget preview width is calculated by multiplying this factor to the widget cell width. */
-    private static final float PREVIEW_SCALE = 0.8f;
+	/**
+	 * Widget preview width is calculated by multiplying this factor to the widget cell width.
+	 */
+	private static final float PREVIEW_SCALE = 0.8f;
 
-    protected int mPresetPreviewSize;
-    private int mCellSize;
+	protected int mPresetPreviewSize;
+	private int mCellSize;
 
-    private WidgetImageView mWidgetImage;
-    private TextView mWidgetName;
-    private TextView mWidgetDims;
+	private WidgetImageView mWidgetImage;
+	private TextView mWidgetName;
+	private TextView mWidgetDims;
 
-    protected WidgetItem mItem;
+	protected WidgetItem mItem;
 
-    private WidgetPreviewLoader mWidgetPreviewLoader;
-    private StylusEventHelper mStylusEventHelper;
+	private WidgetPreviewLoader mWidgetPreviewLoader;
+	private StylusEventHelper mStylusEventHelper;
 
-    protected CancellationSignal mActiveRequest;
-    private boolean mAnimatePreview = true;
+	protected CancellationSignal mActiveRequest;
+	private boolean mAnimatePreview = true;
 
-    protected final BaseActivity mActivity;
+	protected final BaseActivity mActivity;
 
-    public WidgetCell(Context context) {
-        this(context, null);
-    }
+	public WidgetCell(Context context) {
+		this(context, null);
+	}
 
-    public WidgetCell(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+	public WidgetCell(Context context, AttributeSet attrs) {
+		this(context, attrs, 0);
+	}
 
-    public WidgetCell(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+	public WidgetCell(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
 
-        mActivity = BaseActivity.fromContext(context);
-        mStylusEventHelper = new StylusEventHelper(new SimpleOnStylusPressListener(this), this);
+		mActivity = BaseActivity.fromContext(context);
+		mStylusEventHelper = new StylusEventHelper(new SimpleOnStylusPressListener(this), this);
 
-        setContainerWidth();
-        setWillNotDraw(false);
-        setClipToPadding(false);
-        setAccessibilityDelegate(mActivity.getAccessibilityDelegate());
-    }
+		setContainerWidth();
+		setWillNotDraw(false);
+		setClipToPadding(false);
+		setAccessibilityDelegate(mActivity.getAccessibilityDelegate());
+	}
 
-    private void setContainerWidth() {
-        DeviceProfile profile = mActivity.getDeviceProfile();
-        mCellSize = (int) (profile.cellWidthPx * WIDTH_SCALE);
-        mPresetPreviewSize = (int) (mCellSize * PREVIEW_SCALE);
-    }
+	private void setContainerWidth() {
+		DeviceProfile profile = mActivity.getDeviceProfile();
+		mCellSize = (int) (profile.cellWidthPx * WIDTH_SCALE);
+		mPresetPreviewSize = (int) (mCellSize * PREVIEW_SCALE);
+	}
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
+	@Override
+	protected void onFinishInflate() {
+		super.onFinishInflate();
 
-        mWidgetImage = (WidgetImageView) findViewById(R.id.widget_preview);
-        mWidgetName = ((TextView) findViewById(R.id.widget_name));
-        mWidgetDims = ((TextView) findViewById(R.id.widget_dims));
-    }
+		mWidgetImage = (WidgetImageView) findViewById(R.id.widget_preview);
+		mWidgetName = ((TextView) findViewById(R.id.widget_name));
+		mWidgetDims = ((TextView) findViewById(R.id.widget_dims));
+	}
 
-    /**
-     * Called to clear the view and free attached resources. (e.g., {@link Bitmap}
-     */
-    public void clear() {
-        if (DEBUG) {
-            Log.d(TAG, "reset called on:" + mWidgetName.getText());
-        }
-        mWidgetImage.animate().cancel();
-        mWidgetImage.setBitmap(null, null);
-        mWidgetName.setText(null);
-        mWidgetDims.setText(null);
+	/**
+	 * Called to clear the view and free attached resources. (e.g., {@link Bitmap}
+	 */
+	public void clear() {
+		if (DEBUG) {
+			Log.d(TAG, "reset called on:" + mWidgetName.getText());
+		}
+		mWidgetImage.animate().cancel();
+		mWidgetImage.setBitmap(null, null);
+		mWidgetName.setText(null);
+		mWidgetDims.setText(null);
 
-        if (mActiveRequest != null) {
-            mActiveRequest.cancel();
-            mActiveRequest = null;
-        }
-    }
+		if (mActiveRequest != null) {
+			mActiveRequest.cancel();
+			mActiveRequest = null;
+		}
+	}
 
-    public void applyFromCellItem(WidgetItem item, WidgetPreviewLoader loader) {
-        mItem = item;
-        mWidgetName.setText(mItem.label);
-        mWidgetDims.setText(getContext().getString(R.string.widget_dims_format,
-                mItem.spanX, mItem.spanY));
-        mWidgetDims.setContentDescription(getContext().getString(
-                R.string.widget_accessible_dims_format, mItem.spanX, mItem.spanY));
-        mWidgetPreviewLoader = loader;
+	public void applyFromCellItem(WidgetItem item, WidgetPreviewLoader loader) {
+		mItem = item;
+		mWidgetName.setText(mItem.label);
+		mWidgetDims.setText(getContext().getString(R.string.widget_dims_format,
+				mItem.spanX, mItem.spanY));
+		mWidgetDims.setContentDescription(getContext().getString(
+				R.string.widget_accessible_dims_format, mItem.spanX, mItem.spanY));
+		mWidgetPreviewLoader = loader;
 
-        if (item.activityInfo != null) {
-            setTag(new PendingAddShortcutInfo(item.activityInfo));
-        } else {
-            setTag(new PendingAddWidgetInfo(item.widgetInfo));
-        }
-    }
+		if (item.activityInfo != null) {
+			setTag(new PendingAddShortcutInfo(item.activityInfo));
+		} else {
+			setTag(new PendingAddWidgetInfo(item.widgetInfo));
+		}
+	}
 
-    public WidgetImageView getWidgetView() {
-        return mWidgetImage;
-    }
+	public WidgetImageView getWidgetView() {
+		return mWidgetImage;
+	}
 
-    public void setAnimatePreview(boolean shouldAnimate) {
-        mAnimatePreview = shouldAnimate;
-    }
+	public void setAnimatePreview(boolean shouldAnimate) {
+		mAnimatePreview = shouldAnimate;
+	}
 
-    public void applyPreview(Bitmap bitmap) {
-        applyPreview(bitmap, true);
-    }
+	public void applyPreview(Bitmap bitmap) {
+		applyPreview(bitmap, true);
+	}
 
-    public void applyPreview(Bitmap bitmap, boolean animate) {
-        if (bitmap != null) {
-            mWidgetImage.setBitmap(bitmap,
-                    DrawableFactory.get(getContext()).getBadgeForUser(mItem.user, getContext()));
-            if (mAnimatePreview) {
-                mWidgetImage.setAlpha(0f);
-                ViewPropertyAnimator anim = mWidgetImage.animate();
-                anim.alpha(1.0f).setDuration(FADE_IN_DURATION_MS);
-            } else {
-                mWidgetImage.setAlpha(1f);
-            }
-        }
-    }
+	public void applyPreview(Bitmap bitmap, boolean animate) {
+		if (bitmap != null) {
+			mWidgetImage.setBitmap(bitmap,
+					DrawableFactory.get(getContext()).getBadgeForUser(mItem.user, getContext()));
+			if (mAnimatePreview) {
+				mWidgetImage.setAlpha(0f);
+				ViewPropertyAnimator anim = mWidgetImage.animate();
+				anim.alpha(1.0f).setDuration(FADE_IN_DURATION_MS);
+			} else {
+				mWidgetImage.setAlpha(1f);
+			}
+		}
+	}
 
-    public void ensurePreview() {
-        ensurePreview(true);
-    }
+	public void ensurePreview() {
+		ensurePreview(true);
+	}
 
-    public void ensurePreview(boolean animate) {
-        if (mActiveRequest != null) {
-            return;
-        }
-        mActiveRequest = mWidgetPreviewLoader.getPreview(
-                mItem, mPresetPreviewSize, mPresetPreviewSize, this, animate);
-    }
+	public void ensurePreview(boolean animate) {
+		if (mActiveRequest != null) {
+			return;
+		}
+		mActiveRequest = mWidgetPreviewLoader.getPreview(
+				mItem, mPresetPreviewSize, mPresetPreviewSize, this, animate);
+	}
 
-    @Override
-    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
-            int oldTop, int oldRight, int oldBottom) {
-        removeOnLayoutChangeListener(this);
-        ensurePreview();
-    }
+	@Override
+	public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
+							   int oldTop, int oldRight, int oldBottom) {
+		removeOnLayoutChangeListener(this);
+		ensurePreview();
+	}
 
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        boolean handled = super.onTouchEvent(ev);
-        if (mStylusEventHelper.onMotionEvent(ev)) {
-            return true;
-        }
-        return handled;
-    }
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		boolean handled = super.onTouchEvent(ev);
+		if (mStylusEventHelper.onMotionEvent(ev)) {
+			return true;
+		}
+		return handled;
+	}
 
-    /**
-     * Helper method to get the string info of the tag.
-     */
-    private String getTagToString() {
-        if (getTag() instanceof PendingAddWidgetInfo ||
-                getTag() instanceof PendingAddShortcutInfo) {
-            return getTag().toString();
-        }
-        return "";
-    }
+	/**
+	 * Helper method to get the string info of the tag.
+	 */
+	private String getTagToString() {
+		if (getTag() instanceof PendingAddWidgetInfo ||
+				getTag() instanceof PendingAddShortcutInfo) {
+			return getTag().toString();
+		}
+		return "";
+	}
 
-    @Override
-    public void setLayoutParams(ViewGroup.LayoutParams params) {
-        params.width = params.height = mCellSize;
-        super.setLayoutParams(params);
-    }
+	@Override
+	public void setLayoutParams(ViewGroup.LayoutParams params) {
+		params.width = params.height = mCellSize;
+		super.setLayoutParams(params);
+	}
 
-    @Override
-    public CharSequence getAccessibilityClassName() {
-        return WidgetCell.class.getName();
-    }
+	@Override
+	public CharSequence getAccessibilityClassName() {
+		return WidgetCell.class.getName();
+	}
 }

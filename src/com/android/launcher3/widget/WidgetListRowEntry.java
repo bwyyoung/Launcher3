@@ -26,23 +26,23 @@ import java.util.ArrayList;
  */
 public class WidgetListRowEntry {
 
-    public final PackageItemInfo pkgItem;
+	public final PackageItemInfo pkgItem;
 
-    public final ArrayList<WidgetItem> widgets;
+	public final ArrayList<WidgetItem> widgets;
 
-    /**
-     * Character that is used as a section name for the {@link ItemInfo#title}.
-     * (e.g., "G" will be stored if title is "Google")
-     */
-    public String titleSectionName;
+	/**
+	 * Character that is used as a section name for the {@link ItemInfo#title}.
+	 * (e.g., "G" will be stored if title is "Google")
+	 */
+	public String titleSectionName;
 
-    public WidgetListRowEntry(PackageItemInfo pkgItem, ArrayList<WidgetItem> items) {
-        this.pkgItem = pkgItem;
-        this.widgets = items;
-    }
+	public WidgetListRowEntry(PackageItemInfo pkgItem, ArrayList<WidgetItem> items) {
+		this.pkgItem = pkgItem;
+		this.widgets = items;
+	}
 
-    @Override
-    public String toString() {
-        return pkgItem.packageName + ":" + widgets.size();
-    }
+	@Override
+	public String toString() {
+		return pkgItem.packageName + ":" + widgets.size();
+	}
 }

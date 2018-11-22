@@ -38,181 +38,181 @@ import com.android.launcher3.util.TransformingTouchDelegate;
  * A base container view, which supports resizing.
  */
 public abstract class BaseContainerView extends FrameLayout
-        implements DeviceProfile.LauncherLayoutChangeListener {
+		implements DeviceProfile.LauncherLayoutChangeListener {
 
-    private static final Rect sBgPaddingRect = new Rect();
+	private static final Rect sBgPaddingRect = new Rect();
 
-    protected final Drawable mBaseDrawable;
+	protected final Drawable mBaseDrawable;
 
-    private View mRevealView;
-    private View mContent;
+	private View mRevealView;
+	private View mContent;
 
-    private TransformingTouchDelegate mTouchDelegate;
+	private TransformingTouchDelegate mTouchDelegate;
 
-    private final PointF mLastTouchDownPosPx = new PointF(-1.0f, -1.0f);
+	private final PointF mLastTouchDownPosPx = new PointF(-1.0f, -1.0f);
 
-    public BaseContainerView(Context context) {
-        this(context, null);
-    }
+	public BaseContainerView(Context context) {
+		this(context, null);
+	}
 
-    public BaseContainerView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+	public BaseContainerView(Context context, AttributeSet attrs) {
+		this(context, attrs, 0);
+	}
 
-    public BaseContainerView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+	public BaseContainerView(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
 
-        if (this instanceof AllAppsContainerView) {
-            mBaseDrawable = new ColorDrawable();
-        } else {
-            TypedArray a = context.obtainStyledAttributes(attrs,
-                    R.styleable.BaseContainerView, defStyleAttr, 0);
-            mBaseDrawable = a.getDrawable(R.styleable.BaseContainerView_revealBackground);
-            a.recycle();
-        }
-    }
+		if (this instanceof AllAppsContainerView) {
+			mBaseDrawable = new ColorDrawable();
+		} else {
+			TypedArray a = context.obtainStyledAttributes(attrs,
+					R.styleable.BaseContainerView, defStyleAttr, 0);
+			mBaseDrawable = a.getDrawable(R.styleable.BaseContainerView_revealBackground);
+			a.recycle();
+		}
+	}
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
 
-        DeviceProfile grid = Launcher.getLauncher(getContext()).getDeviceProfile();
-        grid.addLauncherLayoutChangedListener(this);
+		DeviceProfile grid = Launcher.getLauncher(getContext()).getDeviceProfile();
+		grid.addLauncherLayoutChangedListener(this);
 
-        View touchDelegateTargetView = getTouchDelegateTargetView();
-        if (touchDelegateTargetView != null) {
-            mTouchDelegate = new TransformingTouchDelegate(touchDelegateTargetView);
-            ((View) touchDelegateTargetView.getParent()).setTouchDelegate(mTouchDelegate);
-        }
-    }
+		View touchDelegateTargetView = getTouchDelegateTargetView();
+		if (touchDelegateTargetView != null) {
+			mTouchDelegate = new TransformingTouchDelegate(touchDelegateTargetView);
+			((View) touchDelegateTargetView.getParent()).setTouchDelegate(mTouchDelegate);
+		}
+	}
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+	@Override
+	protected void onDetachedFromWindow() {
+		super.onDetachedFromWindow();
 
-        DeviceProfile grid = Launcher.getLauncher(getContext()).getDeviceProfile();
-        grid.removeLauncherLayoutChangedListener(this);
-    }
+		DeviceProfile grid = Launcher.getLauncher(getContext()).getDeviceProfile();
+		grid.removeLauncherLayoutChangedListener(this);
+	}
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
+	@Override
+	protected void onFinishInflate() {
+		super.onFinishInflate();
 
-        mContent = findViewById(R.id.main_content);
-        mRevealView = findViewById(R.id.reveal_view);
+		mContent = findViewById(R.id.main_content);
+		mRevealView = findViewById(R.id.reveal_view);
 
-        updatePaddings();
-    }
+		updatePaddings();
+	}
 
-    @Override
-    public void onLauncherLayoutChanged() {
-        updatePaddings();
-    }
+	@Override
+	public void onLauncherLayoutChanged() {
+		updatePaddings();
+	}
 
-    /**
-     * Calculate the background padding as it can change due to insets/content padding change.
-     */
-    private void updatePaddings() {
-        DeviceProfile grid = Launcher.getLauncher(getContext()).getDeviceProfile();
-        int[] padding = grid.getContainerPadding();
+	/**
+	 * Calculate the background padding as it can change due to insets/content padding change.
+	 */
+	private void updatePaddings() {
+		DeviceProfile grid = Launcher.getLauncher(getContext()).getDeviceProfile();
+		int[] padding = grid.getContainerPadding();
 
-        int paddingLeft = padding[0];
-        int paddingRight = padding[1];
-        int paddingTop = 0;
-        int paddingBottom = 0;
+		int paddingLeft = padding[0];
+		int paddingRight = padding[1];
+		int paddingTop = 0;
+		int paddingBottom = 0;
 
-        if (!grid.isVerticalBarLayout()) {
-            paddingLeft += grid.edgeMarginPx;
-            paddingRight += grid.edgeMarginPx;
-            paddingTop = paddingBottom = grid.edgeMarginPx;
-        }
-        updateBackground(paddingLeft, paddingTop, paddingRight, paddingBottom);
-    }
+		if (!grid.isVerticalBarLayout()) {
+			paddingLeft += grid.edgeMarginPx;
+			paddingRight += grid.edgeMarginPx;
+			paddingTop = paddingBottom = grid.edgeMarginPx;
+		}
+		updateBackground(paddingLeft, paddingTop, paddingRight, paddingBottom);
+	}
 
-    /**
-     * Update the background for the reveal view and content view based on the background padding.
-     */
-    protected void updateBackground(int paddingLeft, int paddingTop,
-            int paddingRight, int paddingBottom) {
-        mRevealView.setBackground(new InsetDrawable(mBaseDrawable,
-                paddingLeft, paddingTop, paddingRight, paddingBottom));
-        mContent.setBackground(new InsetDrawable(mBaseDrawable,
-                paddingLeft, paddingTop, paddingRight, paddingBottom));
-    }
+	/**
+	 * Update the background for the reveal view and content view based on the background padding.
+	 */
+	protected void updateBackground(int paddingLeft, int paddingTop,
+									int paddingRight, int paddingBottom) {
+		mRevealView.setBackground(new InsetDrawable(mBaseDrawable,
+				paddingLeft, paddingTop, paddingRight, paddingBottom));
+		mContent.setBackground(new InsetDrawable(mBaseDrawable,
+				paddingLeft, paddingTop, paddingRight, paddingBottom));
+	}
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
+	@Override
+	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+		super.onLayout(changed, left, top, right, bottom);
 
-        View touchDelegateTargetView = getTouchDelegateTargetView();
-        if (touchDelegateTargetView != null) {
-            getRevealView().getBackground().getPadding(sBgPaddingRect);
-            mTouchDelegate.setBounds(
-                    touchDelegateTargetView.getLeft() - sBgPaddingRect.left,
-                    touchDelegateTargetView.getTop() - sBgPaddingRect.top,
-                    touchDelegateTargetView.getRight() + sBgPaddingRect.right,
-                    touchDelegateTargetView.getBottom() + sBgPaddingRect.bottom);
-        }
-    }
+		View touchDelegateTargetView = getTouchDelegateTargetView();
+		if (touchDelegateTargetView != null) {
+			getRevealView().getBackground().getPadding(sBgPaddingRect);
+			mTouchDelegate.setBounds(
+					touchDelegateTargetView.getLeft() - sBgPaddingRect.left,
+					touchDelegateTargetView.getTop() - sBgPaddingRect.top,
+					touchDelegateTargetView.getRight() + sBgPaddingRect.right,
+					touchDelegateTargetView.getBottom() + sBgPaddingRect.bottom);
+		}
+	}
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return handleTouchEvent(ev);
-    }
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		return handleTouchEvent(ev);
+	}
 
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        return handleTouchEvent(ev);
-    }
+	@SuppressLint("ClickableViewAccessibility")
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		return handleTouchEvent(ev);
+	}
 
-    public void setRevealDrawableColor(int color) {
-        ((ColorDrawable) mBaseDrawable).setColor(color);
-    }
+	public void setRevealDrawableColor(int color) {
+		((ColorDrawable) mBaseDrawable).setColor(color);
+	}
 
-    public final View getContentView() {
-        return mContent;
-    }
+	public final View getContentView() {
+		return mContent;
+	}
 
-    public final View getRevealView() {
-        return mRevealView;
-    }
+	public final View getRevealView() {
+		return mRevealView;
+	}
 
 
-    /**
-     * Handles the touch events that shows the workspace when clicking outside the bounds of the
-     * touch delegate target view.
-     */
-    private boolean handleTouchEvent(MotionEvent ev) {
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                // Check if the touch is outside touch delegate target view
-                View touchDelegateTargetView = getTouchDelegateTargetView();
-                float leftBoundPx = touchDelegateTargetView.getLeft();
-                if (ev.getX() < leftBoundPx ||
-                        ev.getX() > (touchDelegateTargetView.getWidth() + leftBoundPx)) {
-                    mLastTouchDownPosPx.set((int) ev.getX(), (int) ev.getY());
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                if (mLastTouchDownPosPx.x > -1) {
-                    ViewConfiguration viewConfig = ViewConfiguration.get(getContext());
-                    float dx = ev.getX() - mLastTouchDownPosPx.x;
-                    float dy = ev.getY() - mLastTouchDownPosPx.y;
-                    float distance = PointF.length(dx, dy);
-                    if (distance < viewConfig.getScaledTouchSlop()) {
-                        // The background was clicked, so just go home
-                        Launcher.getLauncher(getContext()).showWorkspace(true);
-                        return true;
-                    }
-                }
-                // Fall through
-            case MotionEvent.ACTION_CANCEL:
-                mLastTouchDownPosPx.set(-1, -1);
-                break;
-        }
-        return false;
-    }
+	/**
+	 * Handles the touch events that shows the workspace when clicking outside the bounds of the
+	 * touch delegate target view.
+	 */
+	private boolean handleTouchEvent(MotionEvent ev) {
+		switch (ev.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				// Check if the touch is outside touch delegate target view
+				View touchDelegateTargetView = getTouchDelegateTargetView();
+				float leftBoundPx = touchDelegateTargetView.getLeft();
+				if (ev.getX() < leftBoundPx ||
+						ev.getX() > (touchDelegateTargetView.getWidth() + leftBoundPx)) {
+					mLastTouchDownPosPx.set((int) ev.getX(), (int) ev.getY());
+				}
+				break;
+			case MotionEvent.ACTION_UP:
+				if (mLastTouchDownPosPx.x > -1) {
+					ViewConfiguration viewConfig = ViewConfiguration.get(getContext());
+					float dx = ev.getX() - mLastTouchDownPosPx.x;
+					float dy = ev.getY() - mLastTouchDownPosPx.y;
+					float distance = PointF.length(dx, dy);
+					if (distance < viewConfig.getScaledTouchSlop()) {
+						// The background was clicked, so just go home
+						Launcher.getLauncher(getContext()).showWorkspace(true);
+						return true;
+					}
+				}
+				// Fall through
+			case MotionEvent.ACTION_CANCEL:
+				mLastTouchDownPosPx.set(-1, -1);
+				break;
+		}
+		return false;
+	}
 
-    public abstract View getTouchDelegateTargetView();
+	public abstract View getTouchDelegateTargetView();
 }

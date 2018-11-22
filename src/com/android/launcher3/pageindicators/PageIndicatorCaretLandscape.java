@@ -29,37 +29,37 @@ import com.android.launcher3.R;
  * all_apps_caret_size.  Used only for the landscape layout.
  */
 public class PageIndicatorCaretLandscape extends PageIndicator {
-    // all apps pull up handle drawable.
+	// all apps pull up handle drawable.
 
-    public PageIndicatorCaretLandscape(Context context) {
-        this(context, null);
-    }
+	public PageIndicatorCaretLandscape(Context context) {
+		this(context, null);
+	}
 
-    public PageIndicatorCaretLandscape(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+	public PageIndicatorCaretLandscape(Context context, AttributeSet attrs) {
+		this(context, attrs, 0);
+	}
 
-    public PageIndicatorCaretLandscape(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+	public PageIndicatorCaretLandscape(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
 
-        int caretSize = context.getResources().getDimensionPixelSize(R.dimen.all_apps_caret_size);
-        CaretDrawable caretDrawable = new CaretDrawable(context);
-        caretDrawable.setBounds(0, 0, caretSize, caretSize);
-        setCaretDrawable(caretDrawable);
+		int caretSize = context.getResources().getDimensionPixelSize(R.dimen.all_apps_caret_size);
+		CaretDrawable caretDrawable = new CaretDrawable(context);
+		caretDrawable.setBounds(0, 0, caretSize, caretSize);
+		setCaretDrawable(caretDrawable);
 
-        Launcher l = Launcher.getLauncher(context);
-        setOnClickListener(l);
-        setOnLongClickListener(l);
-        setOnFocusChangeListener(l.mFocusHandler);
-    }
+		Launcher l = Launcher.getLauncher(context);
+		setOnClickListener(l);
+		setOnLongClickListener(l);
+		setOnFocusChangeListener(l.mFocusHandler);
+	}
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        Rect drawableBounds = getCaretDrawable().getBounds();
-        int count = canvas.save();
-        canvas.translate((getWidth() - drawableBounds.width()) / 2,
-                getHeight() - drawableBounds.height());
-        getCaretDrawable().draw(canvas);
-        canvas.restoreToCount(count);
-    }
+	@Override
+	protected void onDraw(Canvas canvas) {
+		Rect drawableBounds = getCaretDrawable().getBounds();
+		int count = canvas.save();
+		canvas.translate((getWidth() - drawableBounds.width()) / 2,
+				getHeight() - drawableBounds.height());
+		getCaretDrawable().draw(canvas);
+		canvas.restoreToCount(count);
+	}
 }

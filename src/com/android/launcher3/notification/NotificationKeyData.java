@@ -32,35 +32,35 @@ import com.android.launcher3.Utilities;
  * @see NotificationInfo for the full data used when populating the dummy views.
  */
 public class NotificationKeyData {
-    public final String notificationKey;
-    public final String shortcutId;
-    public int count;
+	public final String notificationKey;
+	public final String shortcutId;
+	public int count;
 
-    private NotificationKeyData(String notificationKey, String shortcutId, int count) {
-        this.notificationKey = notificationKey;
-        this.shortcutId = shortcutId;
-        this.count = Math.max(1, count);
-    }
+	private NotificationKeyData(String notificationKey, String shortcutId, int count) {
+		this.notificationKey = notificationKey;
+		this.shortcutId = shortcutId;
+		this.count = Math.max(1, count);
+	}
 
-    public static NotificationKeyData fromNotification(StatusBarNotification sbn) {
-        Notification notif = sbn.getNotification();
-        return new NotificationKeyData(sbn.getKey(), Utilities.ATLEAST_OREO ? notif.getShortcutId() : null, notif.number);
-    }
+	public static NotificationKeyData fromNotification(StatusBarNotification sbn) {
+		Notification notif = sbn.getNotification();
+		return new NotificationKeyData(sbn.getKey(), Utilities.ATLEAST_OREO ? notif.getShortcutId() : null, notif.number);
+	}
 
-    public static List<String> extractKeysOnly(@NonNull List<NotificationKeyData> notificationKeys) {
-        List<String> keysOnly = new ArrayList<>(notificationKeys.size());
-        for (NotificationKeyData notificationKeyData : notificationKeys) {
-            keysOnly.add(notificationKeyData.notificationKey);
-        }
-        return keysOnly;
-    }
+	public static List<String> extractKeysOnly(@NonNull List<NotificationKeyData> notificationKeys) {
+		List<String> keysOnly = new ArrayList<>(notificationKeys.size());
+		for (NotificationKeyData notificationKeyData : notificationKeys) {
+			keysOnly.add(notificationKeyData.notificationKey);
+		}
+		return keysOnly;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof NotificationKeyData)) {
-            return false;
-        }
-        // Only compare the keys.
-        return ((NotificationKeyData) obj).notificationKey.equals(notificationKey);
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof NotificationKeyData)) {
+			return false;
+		}
+		// Only compare the keys.
+		return ((NotificationKeyData) obj).notificationKey.equals(notificationKey);
+	}
 }

@@ -28,97 +28,97 @@ import android.widget.EditText;
  */
 public class ExtendedEditText extends EditText {
 
-    private boolean mShowImeAfterFirstLayout;
-    private boolean mForceDisableSuggestions = false;
+	private boolean mShowImeAfterFirstLayout;
+	private boolean mForceDisableSuggestions = false;
 
-    /**
-     * Implemented by listeners of the back key.
-     */
-    public interface OnBackKeyListener {
-        public boolean onBackKey();
-    }
+	/**
+	 * Implemented by listeners of the back key.
+	 */
+	public interface OnBackKeyListener {
+		public boolean onBackKey();
+	}
 
-    private OnBackKeyListener mBackKeyListener;
+	private OnBackKeyListener mBackKeyListener;
 
-    public ExtendedEditText(Context context) {
-        // ctor chaining breaks the touch handling
-        super(context);
-    }
+	public ExtendedEditText(Context context) {
+		// ctor chaining breaks the touch handling
+		super(context);
+	}
 
-    public ExtendedEditText(Context context, AttributeSet attrs) {
-        // ctor chaining breaks the touch handling
-        super(context, attrs);
-    }
+	public ExtendedEditText(Context context, AttributeSet attrs) {
+		// ctor chaining breaks the touch handling
+		super(context, attrs);
+	}
 
-    public ExtendedEditText(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+	public ExtendedEditText(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+	}
 
-    public void setOnBackKeyListener(OnBackKeyListener listener) {
-        mBackKeyListener = listener;
-    }
+	public void setOnBackKeyListener(OnBackKeyListener listener) {
+		mBackKeyListener = listener;
+	}
 
-    @Override
-    public boolean onKeyPreIme(int keyCode, KeyEvent event) {
-        // If this is a back key, propagate the key back to the listener
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-            if (mBackKeyListener != null) {
-                return mBackKeyListener.onBackKey();
-            }
-            return false;
-        }
-        return super.onKeyPreIme(keyCode, event);
-    }
+	@Override
+	public boolean onKeyPreIme(int keyCode, KeyEvent event) {
+		// If this is a back key, propagate the key back to the listener
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+			if (mBackKeyListener != null) {
+				return mBackKeyListener.onBackKey();
+			}
+			return false;
+		}
+		return super.onKeyPreIme(keyCode, event);
+	}
 
-    @Override
-    public boolean onDragEvent(DragEvent event) {
-        // We don't want this view to interfere with Launcher own drag and drop.
-        return false;
-    }
+	@Override
+	public boolean onDragEvent(DragEvent event) {
+		// We don't want this view to interfere with Launcher own drag and drop.
+		return false;
+	}
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        if (mShowImeAfterFirstLayout) {
-            // soft input only shows one frame after the layout of the EditText happens,
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    showSoftInput();
-                    mShowImeAfterFirstLayout = false;
-                }
-            });
-        }
-    }
+	@Override
+	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+		super.onLayout(changed, left, top, right, bottom);
+		if (mShowImeAfterFirstLayout) {
+			// soft input only shows one frame after the layout of the EditText happens,
+			post(new Runnable() {
+				@Override
+				public void run() {
+					showSoftInput();
+					mShowImeAfterFirstLayout = false;
+				}
+			});
+		}
+	}
 
-    public void showKeyboard() {
-        mShowImeAfterFirstLayout = !showSoftInput();
-    }
+	public void showKeyboard() {
+		mShowImeAfterFirstLayout = !showSoftInput();
+	}
 
-    private boolean showSoftInput() {
-        return requestFocus() &&
-                ((InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
-                    .showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
-    }
+	private boolean showSoftInput() {
+		return requestFocus() &&
+				((InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
+						.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
+	}
 
-    public void dispatchBackKey() {
-        ((InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
-                .hideSoftInputFromWindow(getWindowToken(), 0);
-        if (mBackKeyListener != null) {
-            mBackKeyListener.onBackKey();
-        }
-    }
+	public void dispatchBackKey() {
+		((InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
+				.hideSoftInputFromWindow(getWindowToken(), 0);
+		if (mBackKeyListener != null) {
+			mBackKeyListener.onBackKey();
+		}
+	}
 
-    /**
-     * Set to true when you want isSuggestionsEnabled to return false.
-     * Use this to disable the red underlines that appear under typos when suggestions is enabled.
-     */
-    public void forceDisableSuggestions(boolean forceDisableSuggestions) {
-        mForceDisableSuggestions = forceDisableSuggestions;
-    }
+	/**
+	 * Set to true when you want isSuggestionsEnabled to return false.
+	 * Use this to disable the red underlines that appear under typos when suggestions is enabled.
+	 */
+	public void forceDisableSuggestions(boolean forceDisableSuggestions) {
+		mForceDisableSuggestions = forceDisableSuggestions;
+	}
 
-    @Override
-    public boolean isSuggestionsEnabled() {
-        return !mForceDisableSuggestions && super.isSuggestionsEnabled();
-    }
+	@Override
+	public boolean isSuggestionsEnabled() {
+		return !mForceDisableSuggestions && super.isSuggestionsEnabled();
+	}
 }

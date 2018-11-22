@@ -28,19 +28,19 @@ import java.util.List;
 
 class AppWidgetManagerCompatVO extends AppWidgetManagerCompatVL {
 
-    AppWidgetManagerCompatVO(Context context) {
-        super(context);
-    }
+	AppWidgetManagerCompatVO(Context context) {
+		super(context);
+	}
 
-    @Override
-    public List<AppWidgetProviderInfo> getAllProviders(@Nullable PackageUserKey packageUser) {
-        if (FeatureFlags.GO_DISABLE_WIDGETS) {
-            return Collections.emptyList();
-        }
-        if (packageUser == null) {
-            return super.getAllProviders(null);
-        }
-        return mAppWidgetManager.getInstalledProvidersForPackage(packageUser.mPackageName,
-                packageUser.mUser);
-    }
+	@Override
+	public List<AppWidgetProviderInfo> getAllProviders(@Nullable PackageUserKey packageUser) {
+		if (FeatureFlags.GO_DISABLE_WIDGETS) {
+			return Collections.emptyList();
+		}
+		if (packageUser == null) {
+			return super.getAllProviders(null);
+		}
+		return mAppWidgetManager.getInstalledProvidersForPackage(packageUser.mPackageName,
+				packageUser.mUser);
+	}
 }

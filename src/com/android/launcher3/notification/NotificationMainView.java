@@ -43,147 +43,148 @@ import com.android.launcher3.util.Themes;
  */
 public class NotificationMainView extends FrameLayout implements SwipeDetector.Listener {
 
-    private NotificationInfo mNotificationInfo;
-    private ViewGroup mTextAndBackground;
-    private int mBackgroundColor;
-    private TextView mTitleView;
-    private TextView mTextView;
+	private NotificationInfo mNotificationInfo;
+	private ViewGroup mTextAndBackground;
+	private int mBackgroundColor;
+	private TextView mTitleView;
+	private TextView mTextView;
 
-    private SwipeDetector mSwipeDetector;
+	private SwipeDetector mSwipeDetector;
 
-    public NotificationMainView(Context context) {
-        this(context, null, 0);
-    }
+	public NotificationMainView(Context context) {
+		this(context, null, 0);
+	}
 
-    public NotificationMainView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
+	public NotificationMainView(Context context, AttributeSet attrs) {
+		this(context, attrs, 0);
+	}
 
-    public NotificationMainView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
+	public NotificationMainView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+	}
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
+	@Override
+	protected void onFinishInflate() {
+		super.onFinishInflate();
 
-        mTextAndBackground = (ViewGroup) findViewById(R.id.text_and_background);
-        ColorDrawable colorBackground = (ColorDrawable) mTextAndBackground.getBackground();
-        mBackgroundColor = colorBackground.getColor();
-        RippleDrawable rippleBackground = new RippleDrawable(ColorStateList.valueOf(
-                Themes.getAttrColor(getContext(), android.R.attr.colorControlHighlight)),
-                colorBackground, null);
-        mTextAndBackground.setBackground(rippleBackground);
-        mTitleView = (TextView) mTextAndBackground.findViewById(R.id.title);
-        mTextView = (TextView) mTextAndBackground.findViewById(R.id.text);
-    }
+		mTextAndBackground = (ViewGroup) findViewById(R.id.text_and_background);
+		ColorDrawable colorBackground = (ColorDrawable) mTextAndBackground.getBackground();
+		mBackgroundColor = colorBackground.getColor();
+		RippleDrawable rippleBackground = new RippleDrawable(ColorStateList.valueOf(
+				Themes.getAttrColor(getContext(), android.R.attr.colorControlHighlight)),
+				colorBackground, null);
+		mTextAndBackground.setBackground(rippleBackground);
+		mTitleView = (TextView) mTextAndBackground.findViewById(R.id.title);
+		mTextView = (TextView) mTextAndBackground.findViewById(R.id.text);
+	}
 
-    public void applyNotificationInfo(NotificationInfo mainNotification, View iconView) {
-        applyNotificationInfo(mainNotification, iconView, false);
-    }
+	public void applyNotificationInfo(NotificationInfo mainNotification, View iconView) {
+		applyNotificationInfo(mainNotification, iconView, false);
+	}
 
-    public void setSwipeDetector(SwipeDetector swipeDetector) {
-        mSwipeDetector = swipeDetector;
-    }
+	public void setSwipeDetector(SwipeDetector swipeDetector) {
+		mSwipeDetector = swipeDetector;
+	}
 
-    /**
-     * Sets the content of this view, animating it after a new icon shifts up if necessary.
-     */
-    public void applyNotificationInfo(NotificationInfo mainNotification, View iconView,
-           boolean animate) {
-        mNotificationInfo = mainNotification;
-        CharSequence title = mNotificationInfo.title;
-        CharSequence text = mNotificationInfo.text;
-        if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(text)) {
-            mTitleView.setText(title.toString());
-            mTextView.setText(text.toString());
-        } else {
-            mTitleView.setMaxLines(2);
-            mTitleView.setText(TextUtils.isEmpty(title) ? text.toString() : title.toString());
-            mTextView.setVisibility(GONE);
-        }
-        iconView.setBackground(mNotificationInfo.getIconForBackground(getContext(),
-                mBackgroundColor));
-        if (mNotificationInfo.intent != null) {
-            setOnClickListener(mNotificationInfo);
-        }
-        setTranslationX(0);
-        // Add a dummy ItemInfo so that logging populates the correct container and item types
-        // instead of DEFAULT_CONTAINERTYPE and DEFAULT_ITEMTYPE, respectively.
-        setTag(new ItemInfo());
-        if (animate) {
-            ObjectAnimator.ofFloat(mTextAndBackground, ALPHA, 0, 1).setDuration(150).start();
-        }
-    }
+	/**
+	 * Sets the content of this view, animating it after a new icon shifts up if necessary.
+	 */
+	public void applyNotificationInfo(NotificationInfo mainNotification, View iconView,
+									  boolean animate) {
+		mNotificationInfo = mainNotification;
+		CharSequence title = mNotificationInfo.title;
+		CharSequence text = mNotificationInfo.text;
+		if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(text)) {
+			mTitleView.setText(title.toString());
+			mTextView.setText(text.toString());
+		} else {
+			mTitleView.setMaxLines(2);
+			mTitleView.setText(TextUtils.isEmpty(title) ? text.toString() : title.toString());
+			mTextView.setVisibility(GONE);
+		}
+		iconView.setBackground(mNotificationInfo.getIconForBackground(getContext(),
+				mBackgroundColor));
+		if (mNotificationInfo.intent != null) {
+			setOnClickListener(mNotificationInfo);
+		}
+		setTranslationX(0);
+		// Add a dummy ItemInfo so that logging populates the correct container and item types
+		// instead of DEFAULT_CONTAINERTYPE and DEFAULT_ITEMTYPE, respectively.
+		setTag(new ItemInfo());
+		if (animate) {
+			ObjectAnimator.ofFloat(mTextAndBackground, ALPHA, 0, 1).setDuration(150).start();
+		}
+	}
 
-    public NotificationInfo getNotificationInfo() {
-        return mNotificationInfo;
-    }
-
-
-    public boolean canChildBeDismissed() {
-        return mNotificationInfo != null && mNotificationInfo.dismissable;
-    }
-
-    public void onChildDismissed() {
-        Launcher launcher = Launcher.getLauncher(getContext());
-        launcher.getPopupDataProvider().cancelNotification(
-                mNotificationInfo.notificationKey);
-        launcher.getUserEventDispatcher().logActionOnItem(
-                LauncherLogProto.Action.Touch.SWIPE,
-                LauncherLogProto.Action.Direction.RIGHT, // Assume all swipes are right for logging.
-                LauncherLogProto.ItemType.NOTIFICATION);
-    }
-
-    // SwipeDetector.Listener's
-    @Override
-    public void onDragStart(boolean start) { }
+	public NotificationInfo getNotificationInfo() {
+		return mNotificationInfo;
+	}
 
 
-    @Override
-    public boolean onDrag(float displacement, float velocity) {
-        setTranslationX(canChildBeDismissed()
-                ? displacement : OverScroll.dampedScroll(displacement, getWidth()));
-        animate().cancel();
-        return true;
-    }
+	public boolean canChildBeDismissed() {
+		return mNotificationInfo != null && mNotificationInfo.dismissable;
+	}
 
-    @Override
-    public void onDragEnd(float velocity, boolean fling) {
-        final boolean willExit;
-        final float endTranslation;
+	public void onChildDismissed() {
+		Launcher launcher = Launcher.getLauncher(getContext());
+		launcher.getPopupDataProvider().cancelNotification(
+				mNotificationInfo.notificationKey);
+		launcher.getUserEventDispatcher().logActionOnItem(
+				LauncherLogProto.Action.Touch.SWIPE,
+				LauncherLogProto.Action.Direction.RIGHT, // Assume all swipes are right for logging.
+				LauncherLogProto.ItemType.NOTIFICATION);
+	}
 
-        if (!canChildBeDismissed()) {
-            willExit = false;
-            endTranslation = 0;
-        } else if (fling) {
-            willExit = true;
-            endTranslation = velocity < 0 ? - getWidth() : getWidth();
-        } else if (Math.abs(getTranslationX()) > getWidth() / 2) {
-            willExit = true;
-            endTranslation = (getTranslationX() < 0 ? -getWidth() : getWidth());
-        } else {
-            willExit = false;
-            endTranslation = 0;
-        }
+	// SwipeDetector.Listener's
+	@Override
+	public void onDragStart(boolean start) {
+	}
 
-        SwipeDetector.ScrollInterpolator interpolator = new SwipeDetector.ScrollInterpolator();
-        interpolator.setVelocityAtZero(velocity);
 
-        long duration = SwipeDetector.calculateDuration(velocity,
-                (endTranslation - getTranslationX()) / getWidth());
-        animate()
-                .setDuration(duration)
-                .setInterpolator(interpolator)
-                .translationX(endTranslation)
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        mSwipeDetector.finishedScrolling();
-                        if (willExit) {
-                            onChildDismissed();
-                        }
-                    }
-                }).start();
-    }
+	@Override
+	public boolean onDrag(float displacement, float velocity) {
+		setTranslationX(canChildBeDismissed()
+				? displacement : OverScroll.dampedScroll(displacement, getWidth()));
+		animate().cancel();
+		return true;
+	}
+
+	@Override
+	public void onDragEnd(float velocity, boolean fling) {
+		final boolean willExit;
+		final float endTranslation;
+
+		if (!canChildBeDismissed()) {
+			willExit = false;
+			endTranslation = 0;
+		} else if (fling) {
+			willExit = true;
+			endTranslation = velocity < 0 ? -getWidth() : getWidth();
+		} else if (Math.abs(getTranslationX()) > getWidth() / 2) {
+			willExit = true;
+			endTranslation = (getTranslationX() < 0 ? -getWidth() : getWidth());
+		} else {
+			willExit = false;
+			endTranslation = 0;
+		}
+
+		SwipeDetector.ScrollInterpolator interpolator = new SwipeDetector.ScrollInterpolator();
+		interpolator.setVelocityAtZero(velocity);
+
+		long duration = SwipeDetector.calculateDuration(velocity,
+				(endTranslation - getTranslationX()) / getWidth());
+		animate()
+				.setDuration(duration)
+				.setInterpolator(interpolator)
+				.translationX(endTranslation)
+				.withEndAction(new Runnable() {
+					@Override
+					public void run() {
+						mSwipeDetector.finishedScrolling();
+						if (willExit) {
+							onChildDismissed();
+						}
+					}
+				}).start();
+	}
 }

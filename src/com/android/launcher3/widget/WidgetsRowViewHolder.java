@@ -23,13 +23,13 @@ import com.android.launcher3.R;
 
 public class WidgetsRowViewHolder extends ViewHolder {
 
-    public final ViewGroup cellContainer;
-    public final BubbleTextView title;
+	public final ViewGroup cellContainer;
+	public final BubbleTextView title;
 
-    public WidgetsRowViewHolder(ViewGroup v) {
-        super(v);
+	public WidgetsRowViewHolder(ViewGroup v) {
+		super(v);
 
-        cellContainer = (ViewGroup) v.findViewById(R.id.widgets_cell_list);
-        title = (BubbleTextView) v.findViewById(R.id.section);
-    }
+		cellContainer = (ViewGroup) v.findViewById(R.id.widgets_cell_list);
+		title = (BubbleTextView) v.findViewById(R.id.section);
+	}
 }

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
 * Copyright (C) 2017 The Android Open Source Project
 *
@@ -23,6 +22,7 @@
         <item name="android:colorAccent">@color/colorAccent</item>
         <item name="bottomSheetNavBarColor">#00000000</item>
     </style>
+
     <style name="WidgetContainerTheme.Dark" parent="LauncherThemeDark">
         <item name="android:colorEdgeEffect">?android:attr/textColorSecondary</item>
         <item name="android:colorPrimaryDark">#616161</item> <!-- Gray 700 -->

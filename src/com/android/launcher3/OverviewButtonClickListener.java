@@ -9,43 +9,47 @@ import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
  * handled the same via {@link #handleViewClick(View)}.
  */
 public abstract class OverviewButtonClickListener implements View.OnClickListener,
-        View.OnLongClickListener {
+		View.OnLongClickListener {
 
-    private int mControlType; /** ControlType enum as defined in {@link Action.Touch} */
+	private int mControlType;
 
-    public OverviewButtonClickListener(int controlType) {
-        mControlType = controlType;
-    }
+	/**
+	 * ControlType enum as defined in {@link Action.Touch}
+	 */
 
-    public void attachTo(View v) {
-        v.setOnClickListener(this);
-        v.setOnLongClickListener(this);
-    }
+	public OverviewButtonClickListener(int controlType) {
+		mControlType = controlType;
+	}
 
-    @Override
-    public void onClick(View view) {
-        if (shouldPerformClick(view)) {
-            handleViewClick(view, Action.Touch.TAP);
-        }
-    }
+	public void attachTo(View v) {
+		v.setOnClickListener(this);
+		v.setOnLongClickListener(this);
+	}
 
-    @Override
-    public boolean onLongClick(View view) {
-        if (shouldPerformClick(view)) {
-            handleViewClick(view, Action.Touch.LONGPRESS);
-        }
-        return true;
-    }
+	@Override
+	public void onClick(View view) {
+		if (shouldPerformClick(view)) {
+			handleViewClick(view, Action.Touch.TAP);
+		}
+	}
 
-    private boolean shouldPerformClick(View view) {
-        return !Launcher.getLauncher(view.getContext()).getWorkspace().isSwitchingState();
-    }
+	@Override
+	public boolean onLongClick(View view) {
+		if (shouldPerformClick(view)) {
+			handleViewClick(view, Action.Touch.LONGPRESS);
+		}
+		return true;
+	}
 
-    private void handleViewClick(View view, int action) {
-        handleViewClick(view);
-        Launcher.getLauncher(view.getContext()).getUserEventDispatcher()
-                .logActionOnControl(action, mControlType);
-    }
+	private boolean shouldPerformClick(View view) {
+		return !Launcher.getLauncher(view.getContext()).getWorkspace().isSwitchingState();
+	}
 
-    public abstract void handleViewClick(View view);
+	private void handleViewClick(View view, int action) {
+		handleViewClick(view);
+		Launcher.getLauncher(view.getContext()).getUserEventDispatcher()
+				.logActionOnControl(action, mControlType);
+	}
+
+	public abstract void handleViewClick(View view);
 }

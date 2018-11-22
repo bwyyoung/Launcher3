@@ -29,41 +29,41 @@ import com.android.launcher3.Utilities;
  */
 public class TintedDrawableSpan extends DynamicDrawableSpan {
 
-    private final Drawable mDrawable;
-    private int mOldTint;
+	private final Drawable mDrawable;
+	private int mOldTint;
 
-    public TintedDrawableSpan(Context context, int resourceId) {
-        super(ALIGN_BOTTOM);
-        mDrawable = context.getDrawable(resourceId);
-        mOldTint = 0;
-        mDrawable.setTint(0);
-    }
+	public TintedDrawableSpan(Context context, int resourceId) {
+		super(ALIGN_BOTTOM);
+		mDrawable = context.getDrawable(resourceId);
+		mOldTint = 0;
+		mDrawable.setTint(0);
+	}
 
-    @Override
-    public int getSize(Paint paint, CharSequence text, int start, int end, FontMetricsInt fm) {
-        fm = fm == null ? paint.getFontMetricsInt() : fm;
-        int iconSize = fm.bottom - fm.top;
-        if (Utilities.ATLEAST_NOUGAT) {
-            mDrawable.setBounds(0, 0, iconSize, iconSize);
-        } else {
-            mDrawable.setBounds(0, -iconSize, iconSize, 0);
-        }
-        return super.getSize(paint, text, start, end, fm);
-    }
+	@Override
+	public int getSize(Paint paint, CharSequence text, int start, int end, FontMetricsInt fm) {
+		fm = fm == null ? paint.getFontMetricsInt() : fm;
+		int iconSize = fm.bottom - fm.top;
+		if (Utilities.ATLEAST_NOUGAT) {
+			mDrawable.setBounds(0, 0, iconSize, iconSize);
+		} else {
+			mDrawable.setBounds(0, -iconSize, iconSize, 0);
+		}
+		return super.getSize(paint, text, start, end, fm);
+	}
 
-    @Override
-    public void draw(Canvas canvas, CharSequence text,
-            int start, int end, float x, int top, int y, int bottom, Paint paint) {
-        int color = paint.getColor();
-        if (mOldTint != color) {
-            mOldTint = color;
-            mDrawable.setTint(mOldTint);
-        }
-        super.draw(canvas, text, start, end, x, top, y, bottom, paint);
-    }
+	@Override
+	public void draw(Canvas canvas, CharSequence text,
+					 int start, int end, float x, int top, int y, int bottom, Paint paint) {
+		int color = paint.getColor();
+		if (mOldTint != color) {
+			mOldTint = color;
+			mDrawable.setTint(mOldTint);
+		}
+		super.draw(canvas, text, start, end, x, top, y, bottom, paint);
+	}
 
-    @Override
-    public Drawable getDrawable() {
-        return mDrawable;
-    }
+	@Override
+	public Drawable getDrawable() {
+		return mDrawable;
+	}
 }

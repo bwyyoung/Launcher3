@@ -2,13 +2,13 @@ package com.android.launcher3.util;
 
 /**
  * Copyright (C) 2016 The Android Open Source Project
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,94 +33,94 @@ import com.android.launcher3.compat.UserManagerCompat;
  */
 public class ContentWriter {
 
-    private final ContentValues mValues;
-    private final Context mContext;
+	private final ContentValues mValues;
+	private final Context mContext;
 
-    private CommitParams mCommitParams;
-    private Bitmap mIcon;
-    private UserHandle mUser;
+	private CommitParams mCommitParams;
+	private Bitmap mIcon;
+	private UserHandle mUser;
 
-    public ContentWriter(Context context, CommitParams commitParams) {
-        this(context);
-        mCommitParams = commitParams;
-    }
+	public ContentWriter(Context context, CommitParams commitParams) {
+		this(context);
+		mCommitParams = commitParams;
+	}
 
-    public ContentWriter(Context context) {
-        this(new ContentValues(), context);
-    }
+	public ContentWriter(Context context) {
+		this(new ContentValues(), context);
+	}
 
-    public ContentWriter(ContentValues values, Context context) {
-        mValues = values;
-        mContext = context;
-    }
+	public ContentWriter(ContentValues values, Context context) {
+		mValues = values;
+		mContext = context;
+	}
 
-    public ContentWriter put(String key, Integer value) {
-        mValues.put(key, value);
-        return this;
-    }
+	public ContentWriter put(String key, Integer value) {
+		mValues.put(key, value);
+		return this;
+	}
 
-    public ContentWriter put(String key, Long value) {
-        mValues.put(key, value);
-        return this;
-    }
+	public ContentWriter put(String key, Long value) {
+		mValues.put(key, value);
+		return this;
+	}
 
-    public ContentWriter put(String key, String value) {
-        mValues.put(key, value);
-        return this;
-    }
+	public ContentWriter put(String key, String value) {
+		mValues.put(key, value);
+		return this;
+	}
 
-    public ContentWriter put(String key, CharSequence value) {
-        mValues.put(key, value == null ? null : value.toString());
-        return this;
-    }
+	public ContentWriter put(String key, CharSequence value) {
+		mValues.put(key, value == null ? null : value.toString());
+		return this;
+	}
 
-    public ContentWriter put(String key, Intent value) {
-        mValues.put(key, value == null ? null : value.toUri(0));
-        return this;
-    }
+	public ContentWriter put(String key, Intent value) {
+		mValues.put(key, value == null ? null : value.toUri(0));
+		return this;
+	}
 
-    public ContentWriter putIcon(Bitmap value, UserHandle user) {
-        mIcon = value;
-        mUser = user;
-        return this;
-    }
+	public ContentWriter putIcon(Bitmap value, UserHandle user) {
+		mIcon = value;
+		mUser = user;
+		return this;
+	}
 
-    public ContentWriter put(String key, UserHandle user) {
-        return put(key, UserManagerCompat.getInstance(mContext).getSerialNumberForUser(user));
-    }
+	public ContentWriter put(String key, UserHandle user) {
+		return put(key, UserManagerCompat.getInstance(mContext).getSerialNumberForUser(user));
+	}
 
-    /**
-     * Commits any pending validation and returns the final values.
-     * Must not be called on UI thread.
-     */
-    public ContentValues getValues(Context context) {
-        Preconditions.assertNonUiThread();
-        if (mIcon != null && !LauncherAppState.getInstance(context).getIconCache()
-                .isDefaultIcon(mIcon, mUser)) {
-            mValues.put(LauncherSettings.Favorites.ICON, Utilities.flattenBitmap(mIcon));
-            mIcon = null;
-        }
-        return mValues;
-    }
+	/**
+	 * Commits any pending validation and returns the final values.
+	 * Must not be called on UI thread.
+	 */
+	public ContentValues getValues(Context context) {
+		Preconditions.assertNonUiThread();
+		if (mIcon != null && !LauncherAppState.getInstance(context).getIconCache()
+				.isDefaultIcon(mIcon, mUser)) {
+			mValues.put(LauncherSettings.Favorites.ICON, Utilities.flattenBitmap(mIcon));
+			mIcon = null;
+		}
+		return mValues;
+	}
 
-    public int commit() {
-        if (mCommitParams != null) {
-            return mContext.getContentResolver().update(mCommitParams.mUri, getValues(mContext),
-                    mCommitParams.mWhere, mCommitParams.mSelectionArgs);
-        }
-        return 0;
-    }
+	public int commit() {
+		if (mCommitParams != null) {
+			return mContext.getContentResolver().update(mCommitParams.mUri, getValues(mContext),
+					mCommitParams.mWhere, mCommitParams.mSelectionArgs);
+		}
+		return 0;
+	}
 
-    public static final class CommitParams {
+	public static final class CommitParams {
 
-        final Uri mUri = LauncherSettings.Favorites.CONTENT_URI;
-        String mWhere;
-        String[] mSelectionArgs;
+		final Uri mUri = LauncherSettings.Favorites.CONTENT_URI;
+		String mWhere;
+		String[] mSelectionArgs;
 
-        public CommitParams(String where, String[] selectionArgs) {
-            mWhere = where;
-            mSelectionArgs = selectionArgs;
-        }
+		public CommitParams(String where, String[] selectionArgs) {
+			mWhere = where;
+			mSelectionArgs = selectionArgs;
+		}
 
-    }
+	}
 }

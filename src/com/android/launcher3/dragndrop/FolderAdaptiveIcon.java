@@ -45,131 +45,132 @@ import java.util.concurrent.Callable;
  */
 @TargetApi(Build.VERSION_CODES.O)
 public class FolderAdaptiveIcon extends AdaptiveIconDrawable {
-    private static final String TAG = "FolderAdaptiveIcon";
+	private static final String TAG = "FolderAdaptiveIcon";
 
-    private final Drawable mBadge;
-    private final Path mMask;
+	private final Drawable mBadge;
+	private final Path mMask;
 
-    private FolderAdaptiveIcon(Drawable bg, Drawable fg, Drawable badge, Path mask) {
-        super(bg, fg);
-        mBadge = badge;
-        mMask = mask;
-    }
+	private FolderAdaptiveIcon(Drawable bg, Drawable fg, Drawable badge, Path mask) {
+		super(bg, fg);
+		mBadge = badge;
+		mMask = mask;
+	}
 
-    @Override
-    public Path getIconMask() {
-        return mMask;
-    }
+	@Override
+	public Path getIconMask() {
+		return mMask;
+	}
 
-    public Drawable getBadge() {
-        return mBadge;
-    }
+	public Drawable getBadge() {
+		return mBadge;
+	}
 
-    public static FolderAdaptiveIcon createFolderAdaptiveIcon(
-            final Launcher launcher, final long folderId, Point dragViewSize) {
-        Preconditions.assertNonUiThread();
-        int margin = launcher.getResources()
-                .getDimensionPixelSize(R.dimen.blur_size_medium_outline);
+	public static FolderAdaptiveIcon createFolderAdaptiveIcon(
+			final Launcher launcher, final long folderId, Point dragViewSize) {
+		Preconditions.assertNonUiThread();
+		int margin = launcher.getResources()
+				.getDimensionPixelSize(R.dimen.blur_size_medium_outline);
 
-        // Allocate various bitmaps on the background thread, because why not!
-        final Bitmap badge = Bitmap.createBitmap(
-                dragViewSize.x - margin, dragViewSize.y - margin, Bitmap.Config.ARGB_8888);
+		// Allocate various bitmaps on the background thread, because why not!
+		final Bitmap badge = Bitmap.createBitmap(
+				dragViewSize.x - margin, dragViewSize.y - margin, Bitmap.Config.ARGB_8888);
 
-        // The bitmap for the preview is generated larger than needed to allow for the spring effect
-        float sizeScaleFactor = 1 + 2 * AdaptiveIconDrawable.getExtraInsetFraction();
-        final Bitmap preview = Bitmap.createBitmap(
-                (int) (dragViewSize.x * sizeScaleFactor), (int) (dragViewSize.y * sizeScaleFactor),
-                Bitmap.Config.ARGB_8888);
+		// The bitmap for the preview is generated larger than needed to allow for the spring effect
+		float sizeScaleFactor = 1 + 2 * AdaptiveIconDrawable.getExtraInsetFraction();
+		final Bitmap preview = Bitmap.createBitmap(
+				(int) (dragViewSize.x * sizeScaleFactor), (int) (dragViewSize.y * sizeScaleFactor),
+				Bitmap.Config.ARGB_8888);
 
-        // Create the actual drawable on the UI thread to avoid race conditions with
-        // FolderIcon draw pass
-        try {
-            return new MainThreadExecutor().submit(new Callable<FolderAdaptiveIcon>() {
-                @Override
-                public FolderAdaptiveIcon call() throws Exception {
-                    FolderIcon icon = launcher.findFolderIcon(folderId);
-                    return icon == null ? null : createDrawableOnUiThread(icon, badge, preview);
-                }
-            }).get();
-        } catch (Exception e) {
-            Log.e(TAG, "Unable to create folder icon", e);
-            return null;
-        }
-    }
+		// Create the actual drawable on the UI thread to avoid race conditions with
+		// FolderIcon draw pass
+		try {
+			return new MainThreadExecutor().submit(new Callable<FolderAdaptiveIcon>() {
+				@Override
+				public FolderAdaptiveIcon call() throws Exception {
+					FolderIcon icon = launcher.findFolderIcon(folderId);
+					return icon == null ? null : createDrawableOnUiThread(icon, badge, preview);
+				}
+			}).get();
+		} catch (Exception e) {
+			Log.e(TAG, "Unable to create folder icon", e);
+			return null;
+		}
+	}
 
-    /**
-     * Initializes various bitmaps on the UI thread and returns the final drawable.
-     */
-    private static FolderAdaptiveIcon createDrawableOnUiThread(FolderIcon icon,
-            Bitmap badgeBitmap, Bitmap previewBitmap) {
-        Preconditions.assertUIThread();
-        float margin = icon.getResources().getDimension(R.dimen.blur_size_medium_outline) / 2;
+	/**
+	 * Initializes various bitmaps on the UI thread and returns the final drawable.
+	 */
+	private static FolderAdaptiveIcon createDrawableOnUiThread(FolderIcon icon,
+															   Bitmap badgeBitmap, Bitmap previewBitmap) {
+		Preconditions.assertUIThread();
+		float margin = icon.getResources().getDimension(R.dimen.blur_size_medium_outline) / 2;
 
-        Canvas c = new Canvas();
-        PreviewBackground bg = icon.getFolderBackground();
+		Canvas c = new Canvas();
+		PreviewBackground bg = icon.getFolderBackground();
 
-        // Initialize badge
-        c.setBitmap(badgeBitmap);
-        bg.drawShadow(c);
-        bg.drawBackgroundStroke(c);
-        icon.drawBadge(c);
+		// Initialize badge
+		c.setBitmap(badgeBitmap);
+		bg.drawShadow(c);
+		bg.drawBackgroundStroke(c);
+		icon.drawBadge(c);
 
-        // Initialize preview
-        float shiftFactor = AdaptiveIconDrawable.getExtraInsetFraction() /
-                (1 + 2 * AdaptiveIconDrawable.getExtraInsetFraction());
-        float previewShiftX = shiftFactor * previewBitmap.getWidth();
-        float previewShiftY = shiftFactor * previewBitmap.getHeight();
+		// Initialize preview
+		float shiftFactor = AdaptiveIconDrawable.getExtraInsetFraction() /
+				(1 + 2 * AdaptiveIconDrawable.getExtraInsetFraction());
+		float previewShiftX = shiftFactor * previewBitmap.getWidth();
+		float previewShiftY = shiftFactor * previewBitmap.getHeight();
 
-        c.setBitmap(previewBitmap);
-        c.translate(previewShiftX, previewShiftY);
-        icon.getPreviewItemManager().draw(c);
-        c.setBitmap(null);
+		c.setBitmap(previewBitmap);
+		c.translate(previewShiftX, previewShiftY);
+		icon.getPreviewItemManager().draw(c);
+		c.setBitmap(null);
 
-        // Initialize mask
-        Path mask = new Path();
-        Matrix m = new Matrix();
-        m.setTranslate(margin, margin);
-        bg.getClipPath().transform(m, mask);
+		// Initialize mask
+		Path mask = new Path();
+		Matrix m = new Matrix();
+		m.setTranslate(margin, margin);
+		bg.getClipPath().transform(m, mask);
 
-        ShiftedBitmapDrawable badge = new ShiftedBitmapDrawable(badgeBitmap, margin, margin);
-        ShiftedBitmapDrawable foreground = new ShiftedBitmapDrawable(previewBitmap,
-                margin - previewShiftX, margin - previewShiftY);
+		ShiftedBitmapDrawable badge = new ShiftedBitmapDrawable(badgeBitmap, margin, margin);
+		ShiftedBitmapDrawable foreground = new ShiftedBitmapDrawable(previewBitmap,
+				margin - previewShiftX, margin - previewShiftY);
 
-        return new FolderAdaptiveIcon(new ColorDrawable(bg.getBgColor()), foreground, badge, mask);
-    }
+		return new FolderAdaptiveIcon(new ColorDrawable(bg.getBgColor()), foreground, badge, mask);
+	}
 
-    /**
-     * A simple drawable which draws a bitmap at a fixed position irrespective of the bounds
-     */
-    private static class ShiftedBitmapDrawable extends Drawable {
+	/**
+	 * A simple drawable which draws a bitmap at a fixed position irrespective of the bounds
+	 */
+	private static class ShiftedBitmapDrawable extends Drawable {
 
-        private final Paint mPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
-        private final Bitmap mBitmap;
-        private final float mShiftX;
-        private final float mShiftY;
+		private final Paint mPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+		private final Bitmap mBitmap;
+		private final float mShiftX;
+		private final float mShiftY;
 
-        ShiftedBitmapDrawable(Bitmap bitmap, float shiftX, float shiftY) {
-            mBitmap = bitmap;
-            mShiftX = shiftX;
-            mShiftY = shiftY;
-        }
+		ShiftedBitmapDrawable(Bitmap bitmap, float shiftX, float shiftY) {
+			mBitmap = bitmap;
+			mShiftX = shiftX;
+			mShiftY = shiftY;
+		}
 
-        @Override
-        public void draw(Canvas canvas) {
-            canvas.drawBitmap(mBitmap, mShiftX, mShiftY, mPaint);
-        }
+		@Override
+		public void draw(Canvas canvas) {
+			canvas.drawBitmap(mBitmap, mShiftX, mShiftY, mPaint);
+		}
 
-        @Override
-        public void setAlpha(int i) { }
+		@Override
+		public void setAlpha(int i) {
+		}
 
-        @Override
-        public void setColorFilter(ColorFilter colorFilter) {
-            mPaint.setColorFilter(colorFilter);
-        }
+		@Override
+		public void setColorFilter(ColorFilter colorFilter) {
+			mPaint.setColorFilter(colorFilter);
+		}
 
-        @Override
-        public int getOpacity() {
-            return PixelFormat.TRANSLUCENT;
-        }
-    }
+		@Override
+		public int getOpacity() {
+			return PixelFormat.TRANSLUCENT;
+		}
+	}
 }

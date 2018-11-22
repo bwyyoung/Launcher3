@@ -33,231 +33,234 @@ import java.util.ArrayList;
 /**
  * Handler class that manages springs for a set of views that should all move based on the same
  * {@link MotionEvent}s.
- *
+ * <p>
  * Supports setting either X or Y velocity on the list of springs added to this handler.
  */
 public class SpringAnimationHandler<T> {
 
-    private static final String TAG = "SpringAnimationHandler";
-    private static final boolean DEBUG = false;
+	private static final String TAG = "SpringAnimationHandler";
+	private static final boolean DEBUG = false;
 
-    private static final float VELOCITY_DAMPING_FACTOR = 0.175f;
+	private static final float VELOCITY_DAMPING_FACTOR = 0.175f;
 
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({Y_DIRECTION, X_DIRECTION})
-    public @interface Direction {}
-    public static final int Y_DIRECTION = 0;
-    public static final int X_DIRECTION = 1;
-    private int mVelocityDirection;
+	@Retention(RetentionPolicy.SOURCE)
+	@IntDef({Y_DIRECTION, X_DIRECTION})
+	public @interface Direction {
+	}
 
-    private VelocityTracker mVelocityTracker;
-    private float mCurrentVelocity = 0;
-    private boolean mShouldComputeVelocity = false;
+	public static final int Y_DIRECTION = 0;
+	public static final int X_DIRECTION = 1;
+	private int mVelocityDirection;
 
-    private AnimationFactory<T> mAnimationFactory;
+	private VelocityTracker mVelocityTracker;
+	private float mCurrentVelocity = 0;
+	private boolean mShouldComputeVelocity = false;
 
-    private ArrayList<SpringAnimation> mAnimations = new ArrayList<>();
+	private AnimationFactory<T> mAnimationFactory;
 
-    /**
-     * @param direction Either {@link #X_DIRECTION} or {@link #Y_DIRECTION}.
-     *                  Determines which direction we use to calculate and set the velocity.
-     * @param factory   The AnimationFactory is responsible for initializing and updating the
-     *                  SpringAnimations added to this class.
-     */
-    public SpringAnimationHandler(@Direction int direction, AnimationFactory<T> factory) {
-        mVelocityDirection = direction;
-        mAnimationFactory = factory;
-    }
+	private ArrayList<SpringAnimation> mAnimations = new ArrayList<>();
 
-    /**
-     * Adds a spring to the list of springs handled by this class.
-     * @param spring The new spring to be added.
-     * @param setDefaultValues If True, sets the spring to the default
-     *                         {@link AnimationFactory} values.
-     */
-    public void add(SpringAnimation spring, boolean setDefaultValues) {
-        if (setDefaultValues) {
-            mAnimationFactory.setDefaultValues(spring);
-        }
-        spring.setStartVelocity(mCurrentVelocity);
-        mAnimations.add(spring);
-    }
+	/**
+	 * @param direction Either {@link #X_DIRECTION} or {@link #Y_DIRECTION}.
+	 *                  Determines which direction we use to calculate and set the velocity.
+	 * @param factory   The AnimationFactory is responsible for initializing and updating the
+	 *                  SpringAnimations added to this class.
+	 */
+	public SpringAnimationHandler(@Direction int direction, AnimationFactory<T> factory) {
+		mVelocityDirection = direction;
+		mAnimationFactory = factory;
+	}
 
-    /**
-     * Adds a new or recycled animation to the list of springs handled by this class.
-     *
-     * @param view The view the spring is attached to.
-     * @param object Used to initialize and update the spring.
-     */
-    public void add(View view, T object) {
-        SpringAnimation spring = (SpringAnimation) view.getTag(R.id.spring_animation_tag);
-        if (spring == null) {
-            spring = mAnimationFactory.initialize(object);
-            view.setTag(R.id.spring_animation_tag, spring);
-        }
-        mAnimationFactory.update(spring, object);
-        add(spring, false /* setDefaultValues */);
-    }
+	/**
+	 * Adds a spring to the list of springs handled by this class.
+	 *
+	 * @param spring           The new spring to be added.
+	 * @param setDefaultValues If True, sets the spring to the default
+	 *                         {@link AnimationFactory} values.
+	 */
+	public void add(SpringAnimation spring, boolean setDefaultValues) {
+		if (setDefaultValues) {
+			mAnimationFactory.setDefaultValues(spring);
+		}
+		spring.setStartVelocity(mCurrentVelocity);
+		mAnimations.add(spring);
+	}
 
-    /**
-     * Stops and removes the spring attached to {@param view}.
-     */
-    public void remove(View view) {
-        remove((SpringAnimation) view.getTag(R.id.spring_animation_tag));
-    }
+	/**
+	 * Adds a new or recycled animation to the list of springs handled by this class.
+	 *
+	 * @param view   The view the spring is attached to.
+	 * @param object Used to initialize and update the spring.
+	 */
+	public void add(View view, T object) {
+		SpringAnimation spring = (SpringAnimation) view.getTag(R.id.spring_animation_tag);
+		if (spring == null) {
+			spring = mAnimationFactory.initialize(object);
+			view.setTag(R.id.spring_animation_tag, spring);
+		}
+		mAnimationFactory.update(spring, object);
+		add(spring, false /* setDefaultValues */);
+	}
 
-    public void remove(SpringAnimation animation) {
-        if (animation.canSkipToEnd()) {
-            animation.skipToEnd();
-        }
-        while (mAnimations.contains(animation)) {
-            mAnimations.remove(animation);
-        }
-    }
+	/**
+	 * Stops and removes the spring attached to {@param view}.
+	 */
+	public void remove(View view) {
+		remove((SpringAnimation) view.getTag(R.id.spring_animation_tag));
+	}
 
-    public void addMovement(MotionEvent event) {
-        int action = event.getActionMasked();
-        if (DEBUG) Log.d(TAG, "addMovement#action=" + action);
-        switch (action) {
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_DOWN:
-                reset();
-                break;
-        }
+	public void remove(SpringAnimation animation) {
+		if (animation.canSkipToEnd()) {
+			animation.skipToEnd();
+		}
+		while (mAnimations.contains(animation)) {
+			mAnimations.remove(animation);
+		}
+	}
 
-        getVelocityTracker().addMovement(event);
-        mShouldComputeVelocity = true;
-    }
+	public void addMovement(MotionEvent event) {
+		int action = event.getActionMasked();
+		if (DEBUG) Log.d(TAG, "addMovement#action=" + action);
+		switch (action) {
+			case MotionEvent.ACTION_CANCEL:
+			case MotionEvent.ACTION_DOWN:
+				reset();
+				break;
+		}
 
-    public void animateToFinalPosition(float position, int startValue) {
-        animateToFinalPosition(position, startValue, mShouldComputeVelocity);
-    }
+		getVelocityTracker().addMovement(event);
+		mShouldComputeVelocity = true;
+	}
 
-    /**
-     * @param position The final animation position.
-     * @param startValue < 0 if scrolling from start to end; > 0 if scrolling from end to start
-     *                   The magnitude of the number changes how the spring will move.
-     * @param setVelocity If true, we set the velocity to {@link #mCurrentVelocity} before
-     *                    starting the animation.
-     */
-    private void animateToFinalPosition(float position, int startValue, boolean setVelocity) {
-        if (DEBUG) {
-            Log.d(TAG, "animateToFinalPosition#position=" + position + ", startValue=" + startValue);
-        }
+	public void animateToFinalPosition(float position, int startValue) {
+		animateToFinalPosition(position, startValue, mShouldComputeVelocity);
+	}
 
-        if (mShouldComputeVelocity) {
-            mCurrentVelocity = computeVelocity();
-        }
+	/**
+	 * @param position    The final animation position.
+	 * @param startValue  < 0 if scrolling from start to end; > 0 if scrolling from end to start
+	 *                    The magnitude of the number changes how the spring will move.
+	 * @param setVelocity If true, we set the velocity to {@link #mCurrentVelocity} before
+	 *                    starting the animation.
+	 */
+	private void animateToFinalPosition(float position, int startValue, boolean setVelocity) {
+		if (DEBUG) {
+			Log.d(TAG, "animateToFinalPosition#position=" + position + ", startValue=" + startValue);
+		}
 
-        int size = mAnimations.size();
-        for (int i = 0; i < size; ++i) {
-            mAnimations.get(i).setStartValue(startValue);
-            if (setVelocity) {
-                mAnimations.get(i).setStartVelocity(mCurrentVelocity);
-            }
-            mAnimations.get(i).animateToFinalPosition(position);
-        }
+		if (mShouldComputeVelocity) {
+			mCurrentVelocity = computeVelocity();
+		}
 
-        reset();
-    }
+		int size = mAnimations.size();
+		for (int i = 0; i < size; ++i) {
+			mAnimations.get(i).setStartValue(startValue);
+			if (setVelocity) {
+				mAnimations.get(i).setStartVelocity(mCurrentVelocity);
+			}
+			mAnimations.get(i).animateToFinalPosition(position);
+		}
 
-    /**
-     * Similar to {@link #animateToFinalPosition(float, int)}, but used in cases where we want to
-     * manually set the velocity.
-     */
-    public void animateToPositionWithVelocity(float position, int startValue, float velocity) {
-        if (DEBUG) {
-            Log.d(TAG, "animateToPosition#pos=" + position + ", start=" + startValue
-                    + ", velocity=" + velocity);
-        }
+		reset();
+	}
 
-        mCurrentVelocity = velocity;
-        mShouldComputeVelocity = false;
-        animateToFinalPosition(position, startValue, true);
-    }
+	/**
+	 * Similar to {@link #animateToFinalPosition(float, int)}, but used in cases where we want to
+	 * manually set the velocity.
+	 */
+	public void animateToPositionWithVelocity(float position, int startValue, float velocity) {
+		if (DEBUG) {
+			Log.d(TAG, "animateToPosition#pos=" + position + ", start=" + startValue
+					+ ", velocity=" + velocity);
+		}
 
-
-    public boolean isRunning() {
-        // All the animations run at the same time so we can just check the first one.
-        return !mAnimations.isEmpty() && mAnimations.get(0).isRunning();
-    }
-
-    public void skipToEnd() {
-        if (DEBUG) Log.d(TAG, "setStartVelocity#skipToEnd");
-        if (DEBUG) Log.v(TAG, "setStartVelocity#skipToEnd", new Exception());
-
-        int size = mAnimations.size();
-        for (int i = 0; i < size; ++i) {
-            if (mAnimations.get(i).canSkipToEnd()) {
-                mAnimations.get(i).skipToEnd();
-            }
-        }
-    }
-
-    public void reset() {
-        if (mVelocityTracker != null) {
-            mVelocityTracker.recycle();
-            mVelocityTracker = null;
-        }
-        mCurrentVelocity = 0;
-        mShouldComputeVelocity = false;
-    }
+		mCurrentVelocity = velocity;
+		mShouldComputeVelocity = false;
+		animateToFinalPosition(position, startValue, true);
+	}
 
 
-    private float computeVelocity() {
-        getVelocityTracker().computeCurrentVelocity(1000 /* millis */);
+	public boolean isRunning() {
+		// All the animations run at the same time so we can just check the first one.
+		return !mAnimations.isEmpty() && mAnimations.get(0).isRunning();
+	}
 
-        float velocity = isVerticalDirection()
-                ? getVelocityTracker().getYVelocity()
-                : getVelocityTracker().getXVelocity();
-        velocity *= VELOCITY_DAMPING_FACTOR;
+	public void skipToEnd() {
+		if (DEBUG) Log.d(TAG, "setStartVelocity#skipToEnd");
+		if (DEBUG) Log.v(TAG, "setStartVelocity#skipToEnd", new Exception());
 
-        if (DEBUG) Log.d(TAG, "computeVelocity=" + velocity);
-        return velocity;
-    }
+		int size = mAnimations.size();
+		for (int i = 0; i < size; ++i) {
+			if (mAnimations.get(i).canSkipToEnd()) {
+				mAnimations.get(i).skipToEnd();
+			}
+		}
+	}
 
-    private boolean isVerticalDirection() {
-        return mVelocityDirection == Y_DIRECTION;
-    }
+	public void reset() {
+		if (mVelocityTracker != null) {
+			mVelocityTracker.recycle();
+			mVelocityTracker = null;
+		}
+		mCurrentVelocity = 0;
+		mShouldComputeVelocity = false;
+	}
 
-    private VelocityTracker getVelocityTracker() {
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
-        return mVelocityTracker;
-    }
 
-    /**
-     * This interface is used to initialize and update the SpringAnimations added to the
-     * {@link SpringAnimationHandler}.
-     *
-     * @param <T> The object that each SpringAnimation is attached to.
-     */
-    public interface AnimationFactory<T> {
+	private float computeVelocity() {
+		getVelocityTracker().computeCurrentVelocity(1000 /* millis */);
 
-        /**
-         * Initializes a new Spring for {@param object}.
-         */
-        SpringAnimation initialize(T object);
+		float velocity = isVerticalDirection()
+				? getVelocityTracker().getYVelocity()
+				: getVelocityTracker().getXVelocity();
+		velocity *= VELOCITY_DAMPING_FACTOR;
 
-        /**
-         * Updates the value of {@param spring} based on {@param object}.
-         */
-        void update(SpringAnimation spring, T object);
+		if (DEBUG) Log.d(TAG, "computeVelocity=" + velocity);
+		return velocity;
+	}
 
-        /**
-         * Sets the factory default values for the given {@param spring}.
-         */
-        void setDefaultValues(SpringAnimation spring);
-    }
+	private boolean isVerticalDirection() {
+		return mVelocityDirection == Y_DIRECTION;
+	}
 
-    /**
-     * Helper method to create a new SpringAnimation for {@param view}.
-     */
-    public static SpringAnimation forView(View view, FloatPropertyCompat property, float finalPos) {
-        SpringAnimation spring = new SpringAnimation(view, property, finalPos);
-        spring.setSpring(new SpringForce(finalPos));
-        return spring;
-    }
+	private VelocityTracker getVelocityTracker() {
+		if (mVelocityTracker == null) {
+			mVelocityTracker = VelocityTracker.obtain();
+		}
+		return mVelocityTracker;
+	}
+
+	/**
+	 * This interface is used to initialize and update the SpringAnimations added to the
+	 * {@link SpringAnimationHandler}.
+	 *
+	 * @param <T> The object that each SpringAnimation is attached to.
+	 */
+	public interface AnimationFactory<T> {
+
+		/**
+		 * Initializes a new Spring for {@param object}.
+		 */
+		SpringAnimation initialize(T object);
+
+		/**
+		 * Updates the value of {@param spring} based on {@param object}.
+		 */
+		void update(SpringAnimation spring, T object);
+
+		/**
+		 * Sets the factory default values for the given {@param spring}.
+		 */
+		void setDefaultValues(SpringAnimation spring);
+	}
+
+	/**
+	 * Helper method to create a new SpringAnimation for {@param view}.
+	 */
+	public static SpringAnimation forView(View view, FloatPropertyCompat property, float finalPos) {
+		SpringAnimation spring = new SpringAnimation(view, property, finalPos);
+		spring.setSpring(new SpringForce(finalPos));
+		return spring;
+	}
 
 }

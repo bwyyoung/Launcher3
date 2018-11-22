@@ -32,59 +32,59 @@ import java.io.IOException;
  */
 public class ShellCommandRule implements TestRule {
 
-    private final String mCmd;
+	private final String mCmd;
 
-    public ShellCommandRule(String cmd) {
-        mCmd = cmd;
-    }
+	public ShellCommandRule(String cmd) {
+		mCmd = cmd;
+	}
 
-    @Override
-    public Statement apply(Statement base, Description description) {
-        return new MyStatement(base, mCmd);
-    }
+	@Override
+	public Statement apply(Statement base, Description description) {
+		return new MyStatement(base, mCmd);
+	}
 
-    public static void runShellCommand(String command) throws IOException {
-        ParcelFileDescriptor pfd = InstrumentationRegistry.getInstrumentation().getUiAutomation()
-                .executeShellCommand(command);
+	public static void runShellCommand(String command) throws IOException {
+		ParcelFileDescriptor pfd = InstrumentationRegistry.getInstrumentation().getUiAutomation()
+				.executeShellCommand(command);
 
-        // Read the input stream fully.
-        FileInputStream fis = new ParcelFileDescriptor.AutoCloseInputStream(pfd);
-        while (fis.read() != -1);
-        fis.close();
-    }
+		// Read the input stream fully.
+		FileInputStream fis = new ParcelFileDescriptor.AutoCloseInputStream(pfd);
+		while (fis.read() != -1) ;
+		fis.close();
+	}
 
-    private static class MyStatement extends Statement {
-        private final Statement mBase;
-        private final String mCmd;
+	private static class MyStatement extends Statement {
+		private final Statement mBase;
+		private final String mCmd;
 
-        public MyStatement(Statement base, String cmd) {
-            mBase = base;
-            mCmd = cmd;
-        }
+		public MyStatement(Statement base, String cmd) {
+			mBase = base;
+			mCmd = cmd;
+		}
 
-        @Override
-        public void evaluate() throws Throwable {
-            runShellCommand(mCmd);
-            mBase.evaluate();
-        }
-    }
+		@Override
+		public void evaluate() throws Throwable {
+			runShellCommand(mCmd);
+			mBase.evaluate();
+		}
+	}
 
-    /**
-     * Grants the launcher permission to bind widgets.
-     */
-    public static ShellCommandRule grandWidgetBind() {
-        return new ShellCommandRule("appwidget grantbind --package "
-                + InstrumentationRegistry.getTargetContext().getPackageName());
-    }
+	/**
+	 * Grants the launcher permission to bind widgets.
+	 */
+	public static ShellCommandRule grandWidgetBind() {
+		return new ShellCommandRule("appwidget grantbind --package "
+				+ InstrumentationRegistry.getTargetContext().getPackageName());
+	}
 
-    /**
-     * Sets the target launcher as default launcher.
-     */
-    public static ShellCommandRule setDefaultLauncher() {
-        ActivityInfo launcher = InstrumentationRegistry.getTargetContext().getPackageManager()
-                .queryIntentActivities(LauncherActivityRule.getHomeIntent(), 0).get(0)
-                .activityInfo;
-        return new ShellCommandRule("cmd package set-home-activity " +
-                new ComponentName(launcher.packageName, launcher.name).flattenToString());
-    }
+	/**
+	 * Sets the target launcher as default launcher.
+	 */
+	public static ShellCommandRule setDefaultLauncher() {
+		ActivityInfo launcher = InstrumentationRegistry.getTargetContext().getPackageManager()
+				.queryIntentActivities(LauncherActivityRule.getHomeIntent(), 0).get(0)
+				.activityInfo;
+		return new ShellCommandRule("cmd package set-home-activity " +
+				new ComponentName(launcher.packageName, launcher.name).flattenToString());
+	}
 }

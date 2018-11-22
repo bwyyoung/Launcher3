@@ -15,57 +15,58 @@ import com.android.launcher3.LauncherSettings.Favorites;
 @MediumTest
 public class RestoreDbTaskTest extends AndroidTestCase {
 
-    public void testGetProfileId() throws Exception {
-        SQLiteDatabase db = new MyDatabaseHelper(23).getWritableDatabase();
-        assertEquals(23, new RestoreDbTask().getDefaultProfileId(db));
-    }
+	public void testGetProfileId() throws Exception {
+		SQLiteDatabase db = new MyDatabaseHelper(23).getWritableDatabase();
+		assertEquals(23, new RestoreDbTask().getDefaultProfileId(db));
+	}
 
-    public void testMigrateProfileId() throws Exception {
-        SQLiteDatabase db = new MyDatabaseHelper(42).getWritableDatabase();
-        // Add some dummy data
-        for (int i = 0; i < 5; i++) {
-            ContentValues values = new ContentValues();
-            values.put(Favorites._ID, i);
-            values.put(Favorites.TITLE, "item " + i);
-            db.insert(Favorites.TABLE_NAME, null, values);
-        }
-        // Verify item add
-        assertEquals(5, getCount(db, "select * from favorites where profileId = 42"));
+	public void testMigrateProfileId() throws Exception {
+		SQLiteDatabase db = new MyDatabaseHelper(42).getWritableDatabase();
+		// Add some dummy data
+		for (int i = 0; i < 5; i++) {
+			ContentValues values = new ContentValues();
+			values.put(Favorites._ID, i);
+			values.put(Favorites.TITLE, "item " + i);
+			db.insert(Favorites.TABLE_NAME, null, values);
+		}
+		// Verify item add
+		assertEquals(5, getCount(db, "select * from favorites where profileId = 42"));
 
-        new RestoreDbTask().migrateProfileId(db, 33);
+		new RestoreDbTask().migrateProfileId(db, 33);
 
-        // verify data migrated
-        assertEquals(0, getCount(db, "select * from favorites where profileId = 42"));
-        assertEquals(5, getCount(db, "select * from favorites where profileId = 33"));
+		// verify data migrated
+		assertEquals(0, getCount(db, "select * from favorites where profileId = 42"));
+		assertEquals(5, getCount(db, "select * from favorites where profileId = 33"));
 
-        // Verify default value changed
-        ContentValues values = new ContentValues();
-        values.put(Favorites._ID, 100);
-        values.put(Favorites.TITLE, "item 100");
-        db.insert(Favorites.TABLE_NAME, null, values);
-        assertEquals(6, getCount(db, "select * from favorites where profileId = 33"));
-    }
+		// Verify default value changed
+		ContentValues values = new ContentValues();
+		values.put(Favorites._ID, 100);
+		values.put(Favorites.TITLE, "item 100");
+		db.insert(Favorites.TABLE_NAME, null, values);
+		assertEquals(6, getCount(db, "select * from favorites where profileId = 33"));
+	}
 
-    private int getCount(SQLiteDatabase db, String sql) {
-        try (Cursor c = db.rawQuery(sql, null)) {
-            return c.getCount();
-        }
-    }
+	private int getCount(SQLiteDatabase db, String sql) {
+		try (Cursor c = db.rawQuery(sql, null)) {
+			return c.getCount();
+		}
+	}
 
-    private class MyDatabaseHelper extends DatabaseHelper {
+	private class MyDatabaseHelper extends DatabaseHelper {
 
-        private final long mProfileId;
+		private final long mProfileId;
 
-        MyDatabaseHelper(long profileId) {
-            super(getContext(), null, null);
-            mProfileId = profileId;
-        }
+		MyDatabaseHelper(long profileId) {
+			super(getContext(), null, null);
+			mProfileId = profileId;
+		}
 
-        @Override
-        public long getDefaultUserSerial() {
-            return mProfileId;
-        }
+		@Override
+		public long getDefaultUserSerial() {
+			return mProfileId;
+		}
 
-        protected void onEmptyDbCreated() { }
-    }
+		protected void onEmptyDbCreated() {
+		}
+	}
 }

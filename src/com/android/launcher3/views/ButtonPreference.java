@@ -28,38 +28,38 @@ import android.view.ViewGroup;
  */
 public class ButtonPreference extends Preference {
 
-    private boolean mWidgetFrameVisible = false;
+	private boolean mWidgetFrameVisible = false;
 
-    public ButtonPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
+	public ButtonPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+	}
 
-    public ButtonPreference(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
+	public ButtonPreference(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+	}
 
-    public ButtonPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+	public ButtonPreference(Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
 
-    public ButtonPreference(Context context) {
-        super(context);
-    }
+	public ButtonPreference(Context context) {
+		super(context);
+	}
 
-    public void setWidgetFrameVisible(boolean isVisible) {
-        if (mWidgetFrameVisible != isVisible) {
-            mWidgetFrameVisible = isVisible;
-            notifyChanged();
-        }
-    }
+	public void setWidgetFrameVisible(boolean isVisible) {
+		if (mWidgetFrameVisible != isVisible) {
+			mWidgetFrameVisible = isVisible;
+			notifyChanged();
+		}
+	}
 
-    @Override
-    protected void onBindView(View view) {
-        super.onBindView(view);
+	@Override
+	protected void onBindView(View view) {
+		super.onBindView(view);
 
-        ViewGroup widgetFrame = view.findViewById(android.R.id.widget_frame);
-        if (widgetFrame != null) {
-            widgetFrame.setVisibility(mWidgetFrameVisible ? View.VISIBLE : View.GONE);
-        }
-    }
+		ViewGroup widgetFrame = view.findViewById(android.R.id.widget_frame);
+		if (widgetFrame != null) {
+			widgetFrame.setVisibility(mWidgetFrameVisible ? View.VISIBLE : View.GONE);
+		}
+	}
 }

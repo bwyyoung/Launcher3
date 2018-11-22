@@ -42,122 +42,122 @@ import com.android.launcher3.ShortcutInfo;
  */
 public abstract class ShortcutConfigActivityInfo {
 
-    private static final String TAG = "SCActivityInfo";
+	private static final String TAG = "SCActivityInfo";
 
-    private final ComponentName mCn;
-    private final UserHandle mUser;
+	private final ComponentName mCn;
+	private final UserHandle mUser;
 
-    protected ShortcutConfigActivityInfo(ComponentName cn, UserHandle user) {
-        mCn = cn;
-        mUser = user;
-    }
+	protected ShortcutConfigActivityInfo(ComponentName cn, UserHandle user) {
+		mCn = cn;
+		mUser = user;
+	}
 
-    public ComponentName getComponent() {
-        return mCn;
-    }
+	public ComponentName getComponent() {
+		return mCn;
+	}
 
-    public UserHandle getUser() {
-        return mUser;
-    }
+	public UserHandle getUser() {
+		return mUser;
+	}
 
-    public int getItemType() {
-        return LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
-    }
+	public int getItemType() {
+		return LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
+	}
 
-    public abstract CharSequence getLabel();
+	public abstract CharSequence getLabel();
 
-    public abstract Drawable getFullResIcon(IconCache cache);
+	public abstract Drawable getFullResIcon(IconCache cache);
 
-    /**
-     * Return a shortcut info, if it can be created directly on drop, without requiring any
-     * {@link #startConfigActivity(Activity, int)}.
-     */
-    public ShortcutInfo createShortcutInfo() {
-        return null;
-    }
+	/**
+	 * Return a shortcut info, if it can be created directly on drop, without requiring any
+	 * {@link #startConfigActivity(Activity, int)}.
+	 */
+	public ShortcutInfo createShortcutInfo() {
+		return null;
+	}
 
-    public boolean startConfigActivity(Activity activity, int requestCode) {
-        Intent intent = new Intent(Intent.ACTION_CREATE_SHORTCUT)
-                .setComponent(getComponent());
-        try {
-            activity.startActivityForResult(intent, requestCode);
-            return true;
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
-        } catch (SecurityException e) {
-            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Launcher does not have the permission to launch " + intent +
-                    ". Make sure to create a MAIN intent-filter for the corresponding activity " +
-                    "or use the exported attribute for this activity.", e);
-        }
-        return false;
-    }
+	public boolean startConfigActivity(Activity activity, int requestCode) {
+		Intent intent = new Intent(Intent.ACTION_CREATE_SHORTCUT)
+				.setComponent(getComponent());
+		try {
+			activity.startActivityForResult(intent, requestCode);
+			return true;
+		} catch (ActivityNotFoundException e) {
+			Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+		} catch (SecurityException e) {
+			Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+			Log.e(TAG, "Launcher does not have the permission to launch " + intent +
+					". Make sure to create a MAIN intent-filter for the corresponding activity " +
+					"or use the exported attribute for this activity.", e);
+		}
+		return false;
+	}
 
-    /**
-     * Returns true if various properties ({@link #getLabel()}, {@link #getFullResIcon}) can
-     * be safely persisted.
-     */
-    public boolean isPersistable() {
-        return true;
-    }
+	/**
+	 * Returns true if various properties ({@link #getLabel()}, {@link #getFullResIcon}) can
+	 * be safely persisted.
+	 */
+	public boolean isPersistable() {
+		return true;
+	}
 
-    static class ShortcutConfigActivityInfoVL extends ShortcutConfigActivityInfo {
+	static class ShortcutConfigActivityInfoVL extends ShortcutConfigActivityInfo {
 
-        private final ActivityInfo mInfo;
-        private final PackageManager mPm;
+		private final ActivityInfo mInfo;
+		private final PackageManager mPm;
 
 
-        public ShortcutConfigActivityInfoVL(ActivityInfo info, PackageManager pm) {
-            super(new ComponentName(info.packageName, info.name), Process.myUserHandle());
-            mInfo = info;
-            mPm = pm;
-        }
+		public ShortcutConfigActivityInfoVL(ActivityInfo info, PackageManager pm) {
+			super(new ComponentName(info.packageName, info.name), Process.myUserHandle());
+			mInfo = info;
+			mPm = pm;
+		}
 
-        @Override
-        public CharSequence getLabel() {
-            return mInfo.loadLabel(mPm);
-        }
+		@Override
+		public CharSequence getLabel() {
+			return mInfo.loadLabel(mPm);
+		}
 
-        @Override
-        public Drawable getFullResIcon(IconCache cache) {
-            return cache.getFullResIcon(mInfo);
-        }
-    }
+		@Override
+		public Drawable getFullResIcon(IconCache cache) {
+			return cache.getFullResIcon(mInfo);
+		}
+	}
 
-    @TargetApi(26)
-    public static class ShortcutConfigActivityInfoVO extends ShortcutConfigActivityInfo {
+	@TargetApi(26)
+	public static class ShortcutConfigActivityInfoVO extends ShortcutConfigActivityInfo {
 
-        private final LauncherActivityInfo mInfo;
+		private final LauncherActivityInfo mInfo;
 
-        public ShortcutConfigActivityInfoVO(LauncherActivityInfo info) {
-            super(info.getComponentName(), info.getUser());
-            mInfo = info;
-        }
+		public ShortcutConfigActivityInfoVO(LauncherActivityInfo info) {
+			super(info.getComponentName(), info.getUser());
+			mInfo = info;
+		}
 
-        @Override
-        public CharSequence getLabel() {
-            return mInfo.getLabel();
-        }
+		@Override
+		public CharSequence getLabel() {
+			return mInfo.getLabel();
+		}
 
-        @Override
-        public Drawable getFullResIcon(IconCache cache) {
-            return cache.getFullResIcon(mInfo);
-        }
+		@Override
+		public Drawable getFullResIcon(IconCache cache) {
+			return cache.getFullResIcon(mInfo);
+		}
 
-        @Override
-        public boolean startConfigActivity(Activity activity, int requestCode) {
-            if (getUser().equals(Process.myUserHandle())) {
-                return super.startConfigActivity(activity, requestCode);
-            }
-            IntentSender is = activity.getSystemService(LauncherApps.class)
-                    .getShortcutConfigActivityIntent(mInfo);
-            try {
-                activity.startIntentSenderForResult(is, requestCode, null, 0, 0, 0);
-                return true;
-            } catch (IntentSender.SendIntentException e) {
-                Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
-    }
+		@Override
+		public boolean startConfigActivity(Activity activity, int requestCode) {
+			if (getUser().equals(Process.myUserHandle())) {
+				return super.startConfigActivity(activity, requestCode);
+			}
+			IntentSender is = activity.getSystemService(LauncherApps.class)
+					.getShortcutConfigActivityIntent(mInfo);
+			try {
+				activity.startIntentSenderForResult(is, requestCode, null, 0, 0, 0);
+				return true;
+			} catch (IntentSender.SendIntentException e) {
+				Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+				return false;
+			}
+		}
+	}
 }

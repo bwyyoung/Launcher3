@@ -26,31 +26,31 @@ import android.support.annotation.NonNull;
  * that creates a shape with a triangular path (pointing up or down).
  */
 public class TriangleShape extends PathShape {
-    private Path mTriangularPath;
+	private Path mTriangularPath;
 
-    public TriangleShape(Path path, float stdWidth, float stdHeight) {
-        super(path, stdWidth, stdHeight);
-        mTriangularPath = path;
-    }
+	public TriangleShape(Path path, float stdWidth, float stdHeight) {
+		super(path, stdWidth, stdHeight);
+		mTriangularPath = path;
+	}
 
-    public static TriangleShape create(float width, float height, boolean isPointingUp) {
-        Path triangularPath = new Path();
-        if (isPointingUp) {
-            triangularPath.moveTo(0, height);
-            triangularPath.lineTo(width, height);
-            triangularPath.lineTo(width / 2, 0);
-            triangularPath.close();
-        } else {
-            triangularPath.moveTo(0, 0);
-            triangularPath.lineTo(width / 2, height);
-            triangularPath.lineTo(width, 0);
-            triangularPath.close();
-        }
-        return new TriangleShape(triangularPath, width, height);
-    }
+	public static TriangleShape create(float width, float height, boolean isPointingUp) {
+		Path triangularPath = new Path();
+		if (isPointingUp) {
+			triangularPath.moveTo(0, height);
+			triangularPath.lineTo(width, height);
+			triangularPath.lineTo(width / 2, 0);
+			triangularPath.close();
+		} else {
+			triangularPath.moveTo(0, 0);
+			triangularPath.lineTo(width / 2, height);
+			triangularPath.lineTo(width, 0);
+			triangularPath.close();
+		}
+		return new TriangleShape(triangularPath, width, height);
+	}
 
-    @Override
-    public void getOutline(@NonNull Outline outline) {
-        outline.setConvexPath(mTriangularPath);
-    }
+	@Override
+	public void getOutline(@NonNull Outline outline) {
+		outline.setConvexPath(mTriangularPath);
+	}
 }

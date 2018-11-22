@@ -41,174 +41,174 @@ import java.nio.ByteBuffer;
  */
 public class HolographicOutlineHelper {
 
-    private static HolographicOutlineHelper sInstance;
+	private static HolographicOutlineHelper sInstance;
 
-    private final Canvas mCanvas = new Canvas();
-    private final Paint mDrawPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-    private final Paint mBlurPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-    private final Paint mErasePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+	private final Canvas mCanvas = new Canvas();
+	private final Paint mDrawPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+	private final Paint mBlurPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+	private final Paint mErasePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
 
-    private final BlurMaskFilter mMediumOuterBlurMaskFilter;
-    private final BlurMaskFilter mThinOuterBlurMaskFilter;
-    private final BlurMaskFilter mMediumInnerBlurMaskFilter;
+	private final BlurMaskFilter mMediumOuterBlurMaskFilter;
+	private final BlurMaskFilter mThinOuterBlurMaskFilter;
+	private final BlurMaskFilter mMediumInnerBlurMaskFilter;
 
-    private final float mShadowBitmapShift;
-    private final BlurMaskFilter mShadowBlurMaskFilter;
+	private final float mShadowBitmapShift;
+	private final BlurMaskFilter mShadowBlurMaskFilter;
 
-    // We have 4 different icon sizes: homescreen, hotseat, folder & all-apps
-    private final SparseArray<Bitmap> mBitmapCache = new SparseArray<>(4);
+	// We have 4 different icon sizes: homescreen, hotseat, folder & all-apps
+	private final SparseArray<Bitmap> mBitmapCache = new SparseArray<>(4);
 
-    private HolographicOutlineHelper(Context context) {
-        Resources res = context.getResources();
+	private HolographicOutlineHelper(Context context) {
+		Resources res = context.getResources();
 
-        float mediumBlur = res.getDimension(R.dimen.blur_size_medium_outline);
-        mMediumOuterBlurMaskFilter = new BlurMaskFilter(mediumBlur, BlurMaskFilter.Blur.OUTER);
-        mMediumInnerBlurMaskFilter = new BlurMaskFilter(mediumBlur, BlurMaskFilter.Blur.NORMAL);
+		float mediumBlur = res.getDimension(R.dimen.blur_size_medium_outline);
+		mMediumOuterBlurMaskFilter = new BlurMaskFilter(mediumBlur, BlurMaskFilter.Blur.OUTER);
+		mMediumInnerBlurMaskFilter = new BlurMaskFilter(mediumBlur, BlurMaskFilter.Blur.NORMAL);
 
-        mThinOuterBlurMaskFilter = new BlurMaskFilter(
-                res.getDimension(R.dimen.blur_size_thin_outline), BlurMaskFilter.Blur.OUTER);
+		mThinOuterBlurMaskFilter = new BlurMaskFilter(
+				res.getDimension(R.dimen.blur_size_thin_outline), BlurMaskFilter.Blur.OUTER);
 
-        mShadowBitmapShift = res.getDimension(R.dimen.blur_size_click_shadow);
-        mShadowBlurMaskFilter = new BlurMaskFilter(mShadowBitmapShift, BlurMaskFilter.Blur.NORMAL);
+		mShadowBitmapShift = res.getDimension(R.dimen.blur_size_click_shadow);
+		mShadowBlurMaskFilter = new BlurMaskFilter(mShadowBitmapShift, BlurMaskFilter.Blur.NORMAL);
 
-        mErasePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
-    }
+		mErasePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
+	}
 
-    public static HolographicOutlineHelper getInstance(Context context) {
-        if (sInstance == null) {
-            sInstance = new HolographicOutlineHelper(context.getApplicationContext());
-        }
-        return sInstance;
-    }
+	public static HolographicOutlineHelper getInstance(Context context) {
+		if (sInstance == null) {
+			sInstance = new HolographicOutlineHelper(context.getApplicationContext());
+		}
+		return sInstance;
+	}
 
-    /**
-     * Applies a more expensive and accurate outline to whatever is currently drawn in a specified
-     * bitmap.
-     */
-    public void applyExpensiveOutlineWithBlur(Bitmap srcDst, Canvas srcDstCanvas) {
-        if (FeatureFlags.IS_DOGFOOD_BUILD && srcDst.getConfig() != Bitmap.Config.ALPHA_8) {
-            throw new RuntimeException("Outline blue is only supported on alpha bitmaps");
-        }
+	/**
+	 * Applies a more expensive and accurate outline to whatever is currently drawn in a specified
+	 * bitmap.
+	 */
+	public void applyExpensiveOutlineWithBlur(Bitmap srcDst, Canvas srcDstCanvas) {
+		if (FeatureFlags.IS_DOGFOOD_BUILD && srcDst.getConfig() != Bitmap.Config.ALPHA_8) {
+			throw new RuntimeException("Outline blue is only supported on alpha bitmaps");
+		}
 
-        // We start by removing most of the alpha channel so as to ignore shadows, and
-        // other types of partial transparency when defining the shape of the object
-        byte[] pixels = new byte[srcDst.getWidth() * srcDst.getHeight()];
-        ByteBuffer buffer = ByteBuffer.wrap(pixels);
-        buffer.rewind();
-        srcDst.copyPixelsToBuffer(buffer);
+		// We start by removing most of the alpha channel so as to ignore shadows, and
+		// other types of partial transparency when defining the shape of the object
+		byte[] pixels = new byte[srcDst.getWidth() * srcDst.getHeight()];
+		ByteBuffer buffer = ByteBuffer.wrap(pixels);
+		buffer.rewind();
+		srcDst.copyPixelsToBuffer(buffer);
 
-        for (int i = 0; i < pixels.length; i++) {
-            if ((pixels[i] & 0xFF) < 188) {
-                pixels[i] = 0;
-            }
-        }
+		for (int i = 0; i < pixels.length; i++) {
+			if ((pixels[i] & 0xFF) < 188) {
+				pixels[i] = 0;
+			}
+		}
 
-        buffer.rewind();
-        srcDst.copyPixelsFromBuffer(buffer);
+		buffer.rewind();
+		srcDst.copyPixelsFromBuffer(buffer);
 
-        // calculate the outer blur first
-        mBlurPaint.setMaskFilter(mMediumOuterBlurMaskFilter);
-        int[] outerBlurOffset = new int[2];
-        Bitmap thickOuterBlur = srcDst.extractAlpha(mBlurPaint, outerBlurOffset);
+		// calculate the outer blur first
+		mBlurPaint.setMaskFilter(mMediumOuterBlurMaskFilter);
+		int[] outerBlurOffset = new int[2];
+		Bitmap thickOuterBlur = srcDst.extractAlpha(mBlurPaint, outerBlurOffset);
 
-        mBlurPaint.setMaskFilter(mThinOuterBlurMaskFilter);
-        int[] brightOutlineOffset = new int[2];
-        Bitmap brightOutline = srcDst.extractAlpha(mBlurPaint, brightOutlineOffset);
+		mBlurPaint.setMaskFilter(mThinOuterBlurMaskFilter);
+		int[] brightOutlineOffset = new int[2];
+		Bitmap brightOutline = srcDst.extractAlpha(mBlurPaint, brightOutlineOffset);
 
-        // calculate the inner blur
-        srcDstCanvas.setBitmap(srcDst);
-        srcDstCanvas.drawColor(0xFF000000, PorterDuff.Mode.SRC_OUT);
-        mBlurPaint.setMaskFilter(mMediumInnerBlurMaskFilter);
-        int[] thickInnerBlurOffset = new int[2];
-        Bitmap thickInnerBlur = srcDst.extractAlpha(mBlurPaint, thickInnerBlurOffset);
+		// calculate the inner blur
+		srcDstCanvas.setBitmap(srcDst);
+		srcDstCanvas.drawColor(0xFF000000, PorterDuff.Mode.SRC_OUT);
+		mBlurPaint.setMaskFilter(mMediumInnerBlurMaskFilter);
+		int[] thickInnerBlurOffset = new int[2];
+		Bitmap thickInnerBlur = srcDst.extractAlpha(mBlurPaint, thickInnerBlurOffset);
 
-        // mask out the inner blur
-        srcDstCanvas.setBitmap(thickInnerBlur);
-        srcDstCanvas.drawBitmap(srcDst, -thickInnerBlurOffset[0],
-                -thickInnerBlurOffset[1], mErasePaint);
-        srcDstCanvas.drawRect(0, 0, -thickInnerBlurOffset[0], thickInnerBlur.getHeight(),
-                mErasePaint);
-        srcDstCanvas.drawRect(0, 0, thickInnerBlur.getWidth(), -thickInnerBlurOffset[1],
-                mErasePaint);
+		// mask out the inner blur
+		srcDstCanvas.setBitmap(thickInnerBlur);
+		srcDstCanvas.drawBitmap(srcDst, -thickInnerBlurOffset[0],
+				-thickInnerBlurOffset[1], mErasePaint);
+		srcDstCanvas.drawRect(0, 0, -thickInnerBlurOffset[0], thickInnerBlur.getHeight(),
+				mErasePaint);
+		srcDstCanvas.drawRect(0, 0, thickInnerBlur.getWidth(), -thickInnerBlurOffset[1],
+				mErasePaint);
 
-        // draw the inner and outer blur
-        srcDstCanvas.setBitmap(srcDst);
-        srcDstCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        srcDstCanvas.drawBitmap(thickInnerBlur, thickInnerBlurOffset[0], thickInnerBlurOffset[1],
-                mDrawPaint);
-        srcDstCanvas.drawBitmap(thickOuterBlur, outerBlurOffset[0], outerBlurOffset[1],
-                mDrawPaint);
+		// draw the inner and outer blur
+		srcDstCanvas.setBitmap(srcDst);
+		srcDstCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+		srcDstCanvas.drawBitmap(thickInnerBlur, thickInnerBlurOffset[0], thickInnerBlurOffset[1],
+				mDrawPaint);
+		srcDstCanvas.drawBitmap(thickOuterBlur, outerBlurOffset[0], outerBlurOffset[1],
+				mDrawPaint);
 
-        // draw the bright outline
-        srcDstCanvas.drawBitmap(brightOutline, brightOutlineOffset[0], brightOutlineOffset[1],
-                mDrawPaint);
+		// draw the bright outline
+		srcDstCanvas.drawBitmap(brightOutline, brightOutlineOffset[0], brightOutlineOffset[1],
+				mDrawPaint);
 
-        // cleanup
-        srcDstCanvas.setBitmap(null);
-        brightOutline.recycle();
-        thickOuterBlur.recycle();
-        thickInnerBlur.recycle();
-    }
+		// cleanup
+		srcDstCanvas.setBitmap(null);
+		brightOutline.recycle();
+		thickOuterBlur.recycle();
+		thickInnerBlur.recycle();
+	}
 
-    public Bitmap createMediumDropShadow(BubbleTextView view) {
-        Drawable drawable = view.getIcon();
-        if (drawable == null) {
-            return null;
-        }
+	public Bitmap createMediumDropShadow(BubbleTextView view) {
+		Drawable drawable = view.getIcon();
+		if (drawable == null) {
+			return null;
+		}
 
-        float scaleX = view.getScaleX();
-        float scaleY = view.getScaleY();
-        Rect rect = drawable.getBounds();
+		float scaleX = view.getScaleX();
+		float scaleY = view.getScaleY();
+		Rect rect = drawable.getBounds();
 
-        int bitmapWidth = (int) (rect.width() * scaleX);
-        int bitmapHeight = (int) (rect.height() * scaleY);
-        if (bitmapHeight <= 0 || bitmapWidth <= 0) {
-            return null;
-        }
+		int bitmapWidth = (int) (rect.width() * scaleX);
+		int bitmapHeight = (int) (rect.height() * scaleY);
+		if (bitmapHeight <= 0 || bitmapWidth <= 0) {
+			return null;
+		}
 
-        int key = (bitmapWidth << 16) | bitmapHeight;
-        Bitmap cache = mBitmapCache.get(key);
-        if (cache == null) {
-            cache = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ALPHA_8);
-            mCanvas.setBitmap(cache);
-            mBitmapCache.put(key, cache);
-        } else {
-            mCanvas.setBitmap(cache);
-            mCanvas.drawColor(Color.BLACK, PorterDuff.Mode.CLEAR);
-        }
+		int key = (bitmapWidth << 16) | bitmapHeight;
+		Bitmap cache = mBitmapCache.get(key);
+		if (cache == null) {
+			cache = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ALPHA_8);
+			mCanvas.setBitmap(cache);
+			mBitmapCache.put(key, cache);
+		} else {
+			mCanvas.setBitmap(cache);
+			mCanvas.drawColor(Color.BLACK, PorterDuff.Mode.CLEAR);
+		}
 
-        int saveCount = mCanvas.save();
-        mCanvas.scale(scaleX, scaleY);
-        mCanvas.translate(-rect.left, -rect.top);
-        drawable.draw(mCanvas);
-        mCanvas.restoreToCount(saveCount);
-        mCanvas.setBitmap(null);
+		int saveCount = mCanvas.save();
+		mCanvas.scale(scaleX, scaleY);
+		mCanvas.translate(-rect.left, -rect.top);
+		drawable.draw(mCanvas);
+		mCanvas.restoreToCount(saveCount);
+		mCanvas.setBitmap(null);
 
-        mBlurPaint.setMaskFilter(mShadowBlurMaskFilter);
+		mBlurPaint.setMaskFilter(mShadowBlurMaskFilter);
 
-        int extraSize = (int) (2 * mShadowBitmapShift);
+		int extraSize = (int) (2 * mShadowBitmapShift);
 
-        int resultWidth = bitmapWidth + extraSize;
-        int resultHeight = bitmapHeight + extraSize;
-        key = (resultWidth << 16) | resultHeight;
-        Bitmap result = mBitmapCache.get(key);
-        if (result == null) {
-            result = Bitmap.createBitmap(resultWidth, resultHeight, Bitmap.Config.ALPHA_8);
-            mCanvas.setBitmap(result);
-        } else {
-            // Use put instead of delete, to avoid unnecessary shrinking of cache array
-            mBitmapCache.put(key, null);
-            mCanvas.setBitmap(result);
-            mCanvas.drawColor(Color.BLACK, PorterDuff.Mode.CLEAR);
-        }
-        mCanvas.drawBitmap(cache, mShadowBitmapShift, mShadowBitmapShift, mBlurPaint);
-        mCanvas.setBitmap(null);
-        return result;
-    }
+		int resultWidth = bitmapWidth + extraSize;
+		int resultHeight = bitmapHeight + extraSize;
+		key = (resultWidth << 16) | resultHeight;
+		Bitmap result = mBitmapCache.get(key);
+		if (result == null) {
+			result = Bitmap.createBitmap(resultWidth, resultHeight, Bitmap.Config.ALPHA_8);
+			mCanvas.setBitmap(result);
+		} else {
+			// Use put instead of delete, to avoid unnecessary shrinking of cache array
+			mBitmapCache.put(key, null);
+			mCanvas.setBitmap(result);
+			mCanvas.drawColor(Color.BLACK, PorterDuff.Mode.CLEAR);
+		}
+		mCanvas.drawBitmap(cache, mShadowBitmapShift, mShadowBitmapShift, mBlurPaint);
+		mCanvas.setBitmap(null);
+		return result;
+	}
 
-    public void recycleShadowBitmap(Bitmap bitmap) {
-        if (bitmap != null) {
-            mBitmapCache.put((bitmap.getWidth() << 16) | bitmap.getHeight(), bitmap);
-        }
-    }
+	public void recycleShadowBitmap(Bitmap bitmap) {
+		if (bitmap != null) {
+			mBitmapCache.put((bitmap.getWidth() << 16) | bitmap.getHeight(), bitmap);
+		}
+	}
 }

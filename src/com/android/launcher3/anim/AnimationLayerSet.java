@@ -20,6 +20,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.util.ArrayMap;
 import android.view.View;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -28,42 +29,42 @@ import java.util.Map;
  */
 public class AnimationLayerSet extends AnimatorListenerAdapter {
 
-    private final ArrayMap<View, Integer> mViewsToLayerTypeMap;
+	private final ArrayMap<View, Integer> mViewsToLayerTypeMap;
 
-    public AnimationLayerSet() {
-        mViewsToLayerTypeMap = new ArrayMap<>();
-    }
+	public AnimationLayerSet() {
+		mViewsToLayerTypeMap = new ArrayMap<>();
+	}
 
-    public AnimationLayerSet(View v) {
-        mViewsToLayerTypeMap = new ArrayMap<>(1);
-        addView(v);
-    }
+	public AnimationLayerSet(View v) {
+		mViewsToLayerTypeMap = new ArrayMap<>(1);
+		addView(v);
+	}
 
-    public void addView(View v) {
-        mViewsToLayerTypeMap.put(v, v.getLayerType());
-    }
+	public void addView(View v) {
+		mViewsToLayerTypeMap.put(v, v.getLayerType());
+	}
 
-    @Override
-    public void onAnimationStart(Animator animation) {
-        // Enable all necessary layers
-        Iterator<Map.Entry<View, Integer>> itr = mViewsToLayerTypeMap.entrySet().iterator();
-        while (itr.hasNext()) {
-            Map.Entry<View, Integer> entry = itr.next();
-            View v = entry.getKey();
-            entry.setValue(v.getLayerType());
-            v.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-            if (v.isAttachedToWindow() && v.getVisibility() == View.VISIBLE) {
-                v.buildLayer();
-            }
-        }
-    }
+	@Override
+	public void onAnimationStart(Animator animation) {
+		// Enable all necessary layers
+		Iterator<Map.Entry<View, Integer>> itr = mViewsToLayerTypeMap.entrySet().iterator();
+		while (itr.hasNext()) {
+			Map.Entry<View, Integer> entry = itr.next();
+			View v = entry.getKey();
+			entry.setValue(v.getLayerType());
+			v.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+			if (v.isAttachedToWindow() && v.getVisibility() == View.VISIBLE) {
+				v.buildLayer();
+			}
+		}
+	}
 
-    @Override
-    public void onAnimationEnd(Animator animation) {
-        Iterator<Map.Entry<View, Integer>> itr = mViewsToLayerTypeMap.entrySet().iterator();
-        while (itr.hasNext()) {
-            Map.Entry<View, Integer> entry = itr.next();
-            entry.getKey().setLayerType(entry.getValue(), null);
-        }
-    }
+	@Override
+	public void onAnimationEnd(Animator animation) {
+		Iterator<Map.Entry<View, Integer>> itr = mViewsToLayerTypeMap.entrySet().iterator();
+		while (itr.hasNext()) {
+			Map.Entry<View, Integer> entry = itr.next();
+			entry.getKey().setLayerType(entry.getValue(), null);
+		}
+	}
 }

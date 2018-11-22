@@ -34,118 +34,119 @@ import java.util.List;
  * This class can be used when proto definition doesn't support nesting.
  */
 public class DumpTargetWrapper {
-    DumpTarget node;
-    ArrayList<DumpTargetWrapper> children;
+	DumpTarget node;
+	ArrayList<DumpTargetWrapper> children;
 
-    public DumpTargetWrapper() {
-        children = new ArrayList<>();
-    }
+	public DumpTargetWrapper() {
+		children = new ArrayList<>();
+	}
 
-    public DumpTargetWrapper(int containerType, int id) {
-        this();
-        node = newContainerTarget(containerType, id);
-    }
+	public DumpTargetWrapper(int containerType, int id) {
+		this();
+		node = newContainerTarget(containerType, id);
+	}
 
-    public DumpTargetWrapper(ItemInfo info) {
-        this();
-        node = newItemTarget(info);
-    }
+	public DumpTargetWrapper(ItemInfo info) {
+		this();
+		node = newItemTarget(info);
+	}
 
-    public DumpTarget getDumpTarget() {
-        return node;
-    }
+	public DumpTarget getDumpTarget() {
+		return node;
+	}
 
-    public void add(DumpTargetWrapper child) {
-        children.add(child);
-    }
+	public void add(DumpTargetWrapper child) {
+		children.add(child);
+	}
 
-    public List<DumpTarget> getFlattenedList() {
-        ArrayList<DumpTarget> list = new ArrayList<>();
-        list.add(node);
-        if (!children.isEmpty()) {
-            for(DumpTargetWrapper t: children) {
-                list.addAll(t.getFlattenedList());
-            }
-            list.add(node); // add a delimiter empty object
-        }
-        return list;
-    }
-    public DumpTarget newItemTarget(ItemInfo info) {
-        DumpTarget dt = new DumpTarget();
-        dt.type = DumpTarget.Type.ITEM;
+	public List<DumpTarget> getFlattenedList() {
+		ArrayList<DumpTarget> list = new ArrayList<>();
+		list.add(node);
+		if (!children.isEmpty()) {
+			for (DumpTargetWrapper t : children) {
+				list.addAll(t.getFlattenedList());
+			}
+			list.add(node); // add a delimiter empty object
+		}
+		return list;
+	}
 
-        switch (info.itemType) {
-            case LauncherSettings.Favorites.ITEM_TYPE_APPLICATION:
-                dt.itemType = ItemType.APP_ICON;
-                break;
-            case LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT:
-                dt.itemType = ItemType.UNKNOWN_ITEMTYPE;
-                break;
-            case LauncherSettings.Favorites.ITEM_TYPE_APPWIDGET:
-                dt.itemType = ItemType.WIDGET;
-                break;
-            case LauncherSettings.Favorites.ITEM_TYPE_DEEP_SHORTCUT:
-                dt.itemType = ItemType.SHORTCUT;
-                break;
-        }
-        return dt;
-    }
+	public DumpTarget newItemTarget(ItemInfo info) {
+		DumpTarget dt = new DumpTarget();
+		dt.type = DumpTarget.Type.ITEM;
 
-    public DumpTarget newContainerTarget(int type, int id) {
-        DumpTarget dt = new DumpTarget();
-        dt.type = DumpTarget.Type.CONTAINER;
-        dt.containerType = type;
-        dt.pageId = id;
-        return dt;
-    }
+		switch (info.itemType) {
+			case LauncherSettings.Favorites.ITEM_TYPE_APPLICATION:
+				dt.itemType = ItemType.APP_ICON;
+				break;
+			case LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT:
+				dt.itemType = ItemType.UNKNOWN_ITEMTYPE;
+				break;
+			case LauncherSettings.Favorites.ITEM_TYPE_APPWIDGET:
+				dt.itemType = ItemType.WIDGET;
+				break;
+			case LauncherSettings.Favorites.ITEM_TYPE_DEEP_SHORTCUT:
+				dt.itemType = ItemType.SHORTCUT;
+				break;
+		}
+		return dt;
+	}
 
-    public static String getDumpTargetStr(DumpTarget t) {
-        if (t == null){
-            return "";
-        }
-        switch (t.type) {
-            case LauncherDumpProto.DumpTarget.Type.ITEM:
-                return getItemStr(t);
-            case LauncherDumpProto.DumpTarget.Type.CONTAINER:
-                String str = LoggerUtils.getFieldName(t.containerType, ContainerType.class);
-                if (t.containerType == ContainerType.WORKSPACE) {
-                    str += " id=" + t.pageId;
-                } else if (t.containerType == ContainerType.FOLDER) {
-                    str += " grid(" + t.gridX + "," + t.gridY+ ")";
-                }
-                return str;
-            default:
-                return "UNKNOWN TARGET TYPE";
-        }
-    }
+	public DumpTarget newContainerTarget(int type, int id) {
+		DumpTarget dt = new DumpTarget();
+		dt.type = DumpTarget.Type.CONTAINER;
+		dt.containerType = type;
+		dt.pageId = id;
+		return dt;
+	}
 
-    private static String getItemStr(DumpTarget t) {
-        String typeStr = LoggerUtils.getFieldName(t.itemType, ItemType.class);
-        if (!TextUtils.isEmpty(t.packageName)) {
-            typeStr += ", package=" + t.packageName;
-        }
-        if (!TextUtils.isEmpty(t.component)) {
-            typeStr += ", component=" + t.component;
-        }
-        return typeStr + ", grid(" + t.gridX + "," + t.gridY + "), span(" + t.spanX + "," + t.spanY
-                + "), pageIdx=" + t.pageId + " user=" + t.userType;
-    }
+	public static String getDumpTargetStr(DumpTarget t) {
+		if (t == null) {
+			return "";
+		}
+		switch (t.type) {
+			case LauncherDumpProto.DumpTarget.Type.ITEM:
+				return getItemStr(t);
+			case LauncherDumpProto.DumpTarget.Type.CONTAINER:
+				String str = LoggerUtils.getFieldName(t.containerType, ContainerType.class);
+				if (t.containerType == ContainerType.WORKSPACE) {
+					str += " id=" + t.pageId;
+				} else if (t.containerType == ContainerType.FOLDER) {
+					str += " grid(" + t.gridX + "," + t.gridY + ")";
+				}
+				return str;
+			default:
+				return "UNKNOWN TARGET TYPE";
+		}
+	}
 
-    public DumpTarget writeToDumpTarget(ItemInfo info) {
-        node.component = info.getTargetComponent() == null? "":
-                info.getTargetComponent().flattenToString();
-        node.packageName = info.getTargetComponent() == null? "":
-                info.getTargetComponent().getPackageName();
-        if (info instanceof LauncherAppWidgetInfo) {
-            node.component = ((LauncherAppWidgetInfo) info).providerName.flattenToString();
-            node.packageName = ((LauncherAppWidgetInfo) info).providerName.getPackageName();
-        }
+	private static String getItemStr(DumpTarget t) {
+		String typeStr = LoggerUtils.getFieldName(t.itemType, ItemType.class);
+		if (!TextUtils.isEmpty(t.packageName)) {
+			typeStr += ", package=" + t.packageName;
+		}
+		if (!TextUtils.isEmpty(t.component)) {
+			typeStr += ", component=" + t.component;
+		}
+		return typeStr + ", grid(" + t.gridX + "," + t.gridY + "), span(" + t.spanX + "," + t.spanY
+				+ "), pageIdx=" + t.pageId + " user=" + t.userType;
+	}
 
-        node.gridX = info.cellX;
-        node.gridY = info.cellY;
-        node.spanX = info.spanX;
-        node.spanY = info.spanY;
-        node.userType = (info.user.equals(Process.myUserHandle()))? UserType.DEFAULT : UserType.WORK;
-        return node;
-    }
+	public DumpTarget writeToDumpTarget(ItemInfo info) {
+		node.component = info.getTargetComponent() == null ? "" :
+				info.getTargetComponent().flattenToString();
+		node.packageName = info.getTargetComponent() == null ? "" :
+				info.getTargetComponent().getPackageName();
+		if (info instanceof LauncherAppWidgetInfo) {
+			node.component = ((LauncherAppWidgetInfo) info).providerName.flattenToString();
+			node.packageName = ((LauncherAppWidgetInfo) info).providerName.getPackageName();
+		}
+
+		node.gridX = info.cellX;
+		node.gridY = info.cellY;
+		node.spanX = info.spanX;
+		node.spanY = info.spanY;
+		node.userType = (info.user.equals(Process.myUserHandle())) ? UserType.DEFAULT : UserType.WORK;
+		return node;
+	}
 }

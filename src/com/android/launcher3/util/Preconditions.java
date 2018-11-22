@@ -26,31 +26,31 @@ import com.android.launcher3.config.FeatureFlags;
  */
 public class Preconditions {
 
-    public static void assertNotNull(Object o) {
-        if (FeatureFlags.IS_DOGFOOD_BUILD && o == null) {
-            throw new IllegalStateException();
-        }
-    }
+	public static void assertNotNull(Object o) {
+		if (FeatureFlags.IS_DOGFOOD_BUILD && o == null) {
+			throw new IllegalStateException();
+		}
+	}
 
-    public static void assertWorkerThread() {
-        if (FeatureFlags.IS_DOGFOOD_BUILD && !isSameLooper(LauncherModel.getWorkerLooper())) {
-            throw new IllegalStateException();
-        }
-    }
+	public static void assertWorkerThread() {
+		if (FeatureFlags.IS_DOGFOOD_BUILD && !isSameLooper(LauncherModel.getWorkerLooper())) {
+			throw new IllegalStateException();
+		}
+	}
 
-    public static void assertUIThread() {
-        if (FeatureFlags.IS_DOGFOOD_BUILD && !isSameLooper(Looper.getMainLooper())) {
-            throw new IllegalStateException();
-        }
-    }
+	public static void assertUIThread() {
+		if (FeatureFlags.IS_DOGFOOD_BUILD && !isSameLooper(Looper.getMainLooper())) {
+			throw new IllegalStateException();
+		}
+	}
 
-    public static void assertNonUiThread() {
-        if (FeatureFlags.IS_DOGFOOD_BUILD && isSameLooper(Looper.getMainLooper())) {
-            throw new IllegalStateException();
-        }
-    }
+	public static void assertNonUiThread() {
+		if (FeatureFlags.IS_DOGFOOD_BUILD && isSameLooper(Looper.getMainLooper())) {
+			throw new IllegalStateException();
+		}
+	}
 
-    private static boolean isSameLooper(Looper looper) {
-        return Looper.myLooper() == looper;
-    }
+	private static boolean isSameLooper(Looper looper) {
+		return Looper.myLooper() == looper;
+	}
 }

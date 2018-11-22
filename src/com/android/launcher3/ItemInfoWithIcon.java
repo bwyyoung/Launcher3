@@ -23,21 +23,22 @@ import android.graphics.Bitmap;
  */
 public abstract class ItemInfoWithIcon extends ItemInfo {
 
-    /**
-     * A bitmap version of the application icon.
-     */
-    public Bitmap iconBitmap;
+	/**
+	 * A bitmap version of the application icon.
+	 */
+	public Bitmap iconBitmap;
 
-    /**
-     * Indicates whether we're using a low res icon
-     */
-    public boolean usingLowResIcon;
+	/**
+	 * Indicates whether we're using a low res icon
+	 */
+	public boolean usingLowResIcon;
 
-    protected ItemInfoWithIcon() { }
+	protected ItemInfoWithIcon() {
+	}
 
-    protected ItemInfoWithIcon(ItemInfoWithIcon info) {
-        super(info);
-        iconBitmap = info.iconBitmap;
-        usingLowResIcon = info.usingLowResIcon;
-    }
+	protected ItemInfoWithIcon(ItemInfoWithIcon info) {
+		super(info);
+		iconBitmap = info.iconBitmap;
+		usingLowResIcon = info.usingLowResIcon;
+	}
 }

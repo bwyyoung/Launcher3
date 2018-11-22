@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<?xml version="1.0" encoding="UTF-8"?><!--
 /*
 * Copyright (C) 2008 The Android Open Source Project
 *
@@ -17,8 +16,7 @@
 */
  -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name" msgid="649227358658669779">"Launcher3"</string>
     <string name="folder_name" msgid="7371454440695724752"></string>
     <string name="work_folder_name" msgid="3753320833950115786">"Trabajo"</string>
@@ -147,8 +145,8 @@
     <string name="msg_disable_suggestions_prompt">No se mostrarán sugerencias en la parte superior de tu lista de aplicaciones, y los datos de uso utilizados para crearlas se borrarán de forma permanente.</string>
     <string name="label_turn_off_suggestions">DESACTIVAR</string>
     <string name="action_edit">Editar</string>
-  <string name="hide_app_sum">Ocultar aplicación del cajón de aplicaciones</string>
-  <string name="hide_app">Ocultar aplicación</string>
+    <string name="hide_app_sum">Ocultar aplicación del cajón de aplicaciones</string>
+    <string name="hide_app">Ocultar aplicación</string>
     <string name="icon_shape_rounded_square">Cuadrado redondeado</string>
     <string name="smartspace_hours_mins">%1$s y %2$s</string>
     <string name="icon_shape_cylinder">Cilindro</string>

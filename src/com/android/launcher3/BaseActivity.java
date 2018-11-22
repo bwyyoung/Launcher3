@@ -27,46 +27,46 @@ import com.android.launcher3.util.SystemUiController;
 
 public abstract class BaseActivity extends Activity {
 
-    protected DeviceProfile mDeviceProfile;
-    protected UserEventDispatcher mUserEventDispatcher;
-    protected SystemUiController mSystemUiController;
+	protected DeviceProfile mDeviceProfile;
+	protected UserEventDispatcher mUserEventDispatcher;
+	protected SystemUiController mSystemUiController;
 
-    public DeviceProfile getDeviceProfile() {
-        return mDeviceProfile;
-    }
+	public DeviceProfile getDeviceProfile() {
+		return mDeviceProfile;
+	}
 
-    public AccessibilityDelegate getAccessibilityDelegate() {
-        return null;
-    }
+	public AccessibilityDelegate getAccessibilityDelegate() {
+		return null;
+	}
 
-    public final UserEventDispatcher getUserEventDispatcher() {
-        if (mUserEventDispatcher == null) {
-            mUserEventDispatcher = UserEventDispatcher.newInstance(this,
-                    mDeviceProfile.isLandscape, isInMultiWindowModeCompat());
-        }
-        return mUserEventDispatcher;
-    }
+	public final UserEventDispatcher getUserEventDispatcher() {
+		if (mUserEventDispatcher == null) {
+			mUserEventDispatcher = UserEventDispatcher.newInstance(this,
+					mDeviceProfile.isLandscape, isInMultiWindowModeCompat());
+		}
+		return mUserEventDispatcher;
+	}
 
-    public boolean isInMultiWindowModeCompat() {
-        return Utilities.ATLEAST_NOUGAT && isInMultiWindowMode();
-    }
+	public boolean isInMultiWindowModeCompat() {
+		return Utilities.ATLEAST_NOUGAT && isInMultiWindowMode();
+	}
 
-    public static BaseActivity fromContext(Context context) {
-        if (context instanceof BaseActivity) {
-            return (BaseActivity) context;
-        }
-        return ((BaseActivity) ((ContextWrapper) context).getBaseContext());
-    }
+	public static BaseActivity fromContext(Context context) {
+		if (context instanceof BaseActivity) {
+			return (BaseActivity) context;
+		}
+		return ((BaseActivity) ((ContextWrapper) context).getBaseContext());
+	}
 
-    public SystemUiController getSystemUiController() {
-        if (mSystemUiController == null) {
-            mSystemUiController = new SystemUiController(getWindow());
-        }
-        return mSystemUiController;
-    }
+	public SystemUiController getSystemUiController() {
+		if (mSystemUiController == null) {
+			mSystemUiController = new SystemUiController(getWindow());
+		}
+		return mSystemUiController;
+	}
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 }

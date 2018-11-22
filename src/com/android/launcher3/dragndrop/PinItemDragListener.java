@@ -48,111 +48,111 @@ import com.android.launcher3.widget.WidgetAddFlowHandler;
 @TargetApi(Build.VERSION_CODES.O)
 public class PinItemDragListener extends BaseItemDragListener implements Parcelable {
 
-    public static final String EXTRA_PIN_ITEM_DRAG_LISTENER = "pin_item_drag_listener";
+	public static final String EXTRA_PIN_ITEM_DRAG_LISTENER = "pin_item_drag_listener";
 
-    private final PinItemRequest mRequest;
+	private final PinItemRequest mRequest;
 
-    public PinItemDragListener(PinItemRequest request, Rect previewRect,
-            int previewBitmapWidth, int previewViewWidth) {
-        super(previewRect, previewBitmapWidth, previewViewWidth);
-        mRequest = request;
-    }
+	public PinItemDragListener(PinItemRequest request, Rect previewRect,
+							   int previewBitmapWidth, int previewViewWidth) {
+		super(previewRect, previewBitmapWidth, previewViewWidth);
+		mRequest = request;
+	}
 
-    private PinItemDragListener(Parcel parcel) {
-        super(parcel);
-        mRequest = PinItemRequest.CREATOR.createFromParcel(parcel);
-    }
+	private PinItemDragListener(Parcel parcel) {
+		super(parcel);
+		mRequest = PinItemRequest.CREATOR.createFromParcel(parcel);
+	}
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+	@Override
+	public int describeContents() {
+		return 0;
+	}
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        super.writeToParcel(parcel, i);
-        mRequest.writeToParcel(parcel, i);
-    }
+	@Override
+	public void writeToParcel(Parcel parcel, int i) {
+		super.writeToParcel(parcel, i);
+		mRequest.writeToParcel(parcel, i);
+	}
 
-    @Override
-    protected boolean onDragStart(DragEvent event) {
-        if (!mRequest.isValid()) {
-            return false;
-        }
-        return super.onDragStart(event);
-    }
+	@Override
+	protected boolean onDragStart(DragEvent event) {
+		if (!mRequest.isValid()) {
+			return false;
+		}
+		return super.onDragStart(event);
+	}
 
-    @Override
-    protected PendingItemDragHelper createDragHelper() {
-        final PendingAddItemInfo item;
-        if (mRequest.getRequestType() == PinItemRequest.REQUEST_TYPE_SHORTCUT) {
-            item = new PendingAddShortcutInfo(
-                    new PinShortcutRequestActivityInfo(mRequest, mLauncher));
-        } else {
-            // mRequest.getRequestType() == PinItemRequestCompat.REQUEST_TYPE_APPWIDGET
-            LauncherAppWidgetProviderInfo providerInfo =
-                    LauncherAppWidgetProviderInfo.fromProviderInfo(
-                            mLauncher, mRequest.getAppWidgetProviderInfo(mLauncher));
-            final PinWidgetFlowHandler flowHandler =
-                    new PinWidgetFlowHandler(providerInfo, mRequest);
-            item = new PendingAddWidgetInfo(providerInfo) {
-                @Override
-                public WidgetAddFlowHandler getHandler() {
-                    return flowHandler;
-                }
-            };
-        }
-        View view = new View(mLauncher);
-        view.setTag(item);
+	@Override
+	protected PendingItemDragHelper createDragHelper() {
+		final PendingAddItemInfo item;
+		if (mRequest.getRequestType() == PinItemRequest.REQUEST_TYPE_SHORTCUT) {
+			item = new PendingAddShortcutInfo(
+					new PinShortcutRequestActivityInfo(mRequest, mLauncher));
+		} else {
+			// mRequest.getRequestType() == PinItemRequestCompat.REQUEST_TYPE_APPWIDGET
+			LauncherAppWidgetProviderInfo providerInfo =
+					LauncherAppWidgetProviderInfo.fromProviderInfo(
+							mLauncher, mRequest.getAppWidgetProviderInfo(mLauncher));
+			final PinWidgetFlowHandler flowHandler =
+					new PinWidgetFlowHandler(providerInfo, mRequest);
+			item = new PendingAddWidgetInfo(providerInfo) {
+				@Override
+				public WidgetAddFlowHandler getHandler() {
+					return flowHandler;
+				}
+			};
+		}
+		View view = new View(mLauncher);
+		view.setTag(item);
 
-        PendingItemDragHelper dragHelper = new PendingItemDragHelper(view);
-        if (mRequest.getRequestType() == PinItemRequest.REQUEST_TYPE_APPWIDGET) {
-            dragHelper.setPreview(getPreview(mRequest));
-        }
-        return dragHelper;
-    }
+		PendingItemDragHelper dragHelper = new PendingItemDragHelper(view);
+		if (mRequest.getRequestType() == PinItemRequest.REQUEST_TYPE_APPWIDGET) {
+			dragHelper.setPreview(getPreview(mRequest));
+		}
+		return dragHelper;
+	}
 
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, LauncherLogProto.Target target,
-            LauncherLogProto.Target targetParent) {
-        targetParent.containerType = LauncherLogProto.ContainerType.PINITEM;
-    }
+	@Override
+	public void fillInLogContainerData(View v, ItemInfo info, LauncherLogProto.Target target,
+									   LauncherLogProto.Target targetParent) {
+		targetParent.containerType = LauncherLogProto.ContainerType.PINITEM;
+	}
 
-    public static RemoteViews getPreview(PinItemRequest request) {
-        Bundle extras = request.getExtras();
-        if (extras != null &&
-                extras.get(AppWidgetManager.EXTRA_APPWIDGET_PREVIEW) instanceof RemoteViews) {
-            return (RemoteViews) extras.get(AppWidgetManager.EXTRA_APPWIDGET_PREVIEW);
-        }
-        return null;
-    }
+	public static RemoteViews getPreview(PinItemRequest request) {
+		Bundle extras = request.getExtras();
+		if (extras != null &&
+				extras.get(AppWidgetManager.EXTRA_APPWIDGET_PREVIEW) instanceof RemoteViews) {
+			return (RemoteViews) extras.get(AppWidgetManager.EXTRA_APPWIDGET_PREVIEW);
+		}
+		return null;
+	}
 
-    public static boolean handleDragRequest(Launcher launcher, Intent intent) {
-        if (!Utilities.ATLEAST_OREO) {
-            return false;
-        }
-        if (intent == null || !Intent.ACTION_MAIN.equals(intent.getAction())) {
-            return false;
-        }
-        Parcelable dragExtra = intent.getParcelableExtra(EXTRA_PIN_ITEM_DRAG_LISTENER);
-        if (dragExtra instanceof PinItemDragListener) {
-            PinItemDragListener dragListener = (PinItemDragListener) dragExtra;
-            dragListener.setLauncher(launcher);
+	public static boolean handleDragRequest(Launcher launcher, Intent intent) {
+		if (!Utilities.ATLEAST_OREO) {
+			return false;
+		}
+		if (intent == null || !Intent.ACTION_MAIN.equals(intent.getAction())) {
+			return false;
+		}
+		Parcelable dragExtra = intent.getParcelableExtra(EXTRA_PIN_ITEM_DRAG_LISTENER);
+		if (dragExtra instanceof PinItemDragListener) {
+			PinItemDragListener dragListener = (PinItemDragListener) dragExtra;
+			dragListener.setLauncher(launcher);
 
-            launcher.getDragLayer().setOnDragListener(dragListener);
-            return true;
-        }
-        return false;
-    }
+			launcher.getDragLayer().setOnDragListener(dragListener);
+			return true;
+		}
+		return false;
+	}
 
-    public static final Parcelable.Creator<PinItemDragListener> CREATOR =
-            new Parcelable.Creator<PinItemDragListener>() {
-                public PinItemDragListener createFromParcel(Parcel source) {
-                    return new PinItemDragListener(source);
-                }
+	public static final Parcelable.Creator<PinItemDragListener> CREATOR =
+			new Parcelable.Creator<PinItemDragListener>() {
+				public PinItemDragListener createFromParcel(Parcel source) {
+					return new PinItemDragListener(source);
+				}
 
-                public PinItemDragListener[] newArray(int size) {
-                    return new PinItemDragListener[size];
-                }
-            };
+				public PinItemDragListener[] newArray(int size) {
+					return new PinItemDragListener[size];
+				}
+			};
 }

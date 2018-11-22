@@ -21,17 +21,17 @@ import android.view.animation.PathInterpolator;
 
 /**
  * Utility class to receive interpolators from.
- *
+ * <p>
  * This class was copied from com.android.systemui.
  */
 public class Interpolators {
-    public static final Interpolator FAST_OUT_SLOW_IN = new PathInterpolator(0.4f, 0f, 0.2f, 1f);
-    public static final Interpolator FAST_OUT_LINEAR_IN = new PathInterpolator(0.4f, 0f, 1f, 1f);
-    public static final Interpolator LINEAR_OUT_SLOW_IN = new PathInterpolator(0f, 0f, 0.2f, 1f);
+	public static final Interpolator FAST_OUT_SLOW_IN = new PathInterpolator(0.4f, 0f, 0.2f, 1f);
+	public static final Interpolator FAST_OUT_LINEAR_IN = new PathInterpolator(0.4f, 0f, 1f, 1f);
+	public static final Interpolator LINEAR_OUT_SLOW_IN = new PathInterpolator(0f, 0f, 0.2f, 1f);
 
-    /**
-     * Interpolator to be used when animating a move based on a click. Pair with enough duration.
-     */
-    public static final Interpolator TOUCH_RESPONSE =
-            new PathInterpolator(0.3f, 0f, 0.1f, 1f);
+	/**
+	 * Interpolator to be used when animating a move based on a click. Pair with enough duration.
+	 */
+	public static final Interpolator TOUCH_RESPONSE =
+			new PathInterpolator(0.3f, 0f, 0.1f, 1f);
 }

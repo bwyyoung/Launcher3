@@ -25,40 +25,40 @@ import android.graphics.Bitmap;
  */
 public class AppDiscoveryItem {
 
-    public final String packageName;
-    public final boolean isInstantApp;
-    public final boolean isRecent;
-    public final float starRating;
-    public final long reviewCount;
-    public final Intent launchIntent;
-    public final Intent installIntent;
-    public final CharSequence title;
-    public final String publisher;
-    public final String price;
-    public final Bitmap bitmap;
+	public final String packageName;
+	public final boolean isInstantApp;
+	public final boolean isRecent;
+	public final float starRating;
+	public final long reviewCount;
+	public final Intent launchIntent;
+	public final Intent installIntent;
+	public final CharSequence title;
+	public final String publisher;
+	public final String price;
+	public final Bitmap bitmap;
 
-    public AppDiscoveryItem(String packageName,
-                            boolean isInstantApp,
-                            boolean isRecent,
-                            float starRating,
-                            long reviewCount,
-                            CharSequence title,
-                            String publisher,
-                            Bitmap bitmap,
-                            String price,
-                            Intent launchIntent,
-                            Intent installIntent) {
-        this.packageName = packageName;
-        this.isInstantApp = isInstantApp;
-        this.isRecent = isRecent;
-        this.starRating = starRating;
-        this.reviewCount = reviewCount;
-        this.launchIntent = launchIntent;
-        this.installIntent = installIntent;
-        this.title = title;
-        this.publisher = publisher;
-        this.price = price;
-        this.bitmap = bitmap;
-    }
+	public AppDiscoveryItem(String packageName,
+							boolean isInstantApp,
+							boolean isRecent,
+							float starRating,
+							long reviewCount,
+							CharSequence title,
+							String publisher,
+							Bitmap bitmap,
+							String price,
+							Intent launchIntent,
+							Intent installIntent) {
+		this.packageName = packageName;
+		this.isInstantApp = isInstantApp;
+		this.isRecent = isRecent;
+		this.starRating = starRating;
+		this.reviewCount = reviewCount;
+		this.launchIntent = launchIntent;
+		this.installIntent = installIntent;
+		this.title = title;
+		this.publisher = publisher;
+		this.price = price;
+		this.bitmap = bitmap;
+	}
 
 }

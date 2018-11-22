@@ -33,65 +33,65 @@ import com.android.launcher3.dragndrop.DragLayer;
  */
 public class PreviewImageView extends ImageView {
 
-    private final Rect mTempRect = new Rect();
-    private final DragLayer mParent;
+	private final Rect mTempRect = new Rect();
+	private final DragLayer mParent;
 
-    private Bitmap mBitmap;
-    private Canvas mCanvas;
+	private Bitmap mBitmap;
+	private Canvas mCanvas;
 
-    public PreviewImageView(DragLayer parent) {
-        super(parent.getContext());
-        mParent = parent;
-    }
+	public PreviewImageView(DragLayer parent) {
+		super(parent.getContext());
+		mParent = parent;
+	}
 
-    public void copy(View view) {
-        final int width = view.getMeasuredWidth();
-        final int height = view.getMeasuredHeight();
+	public void copy(View view) {
+		final int width = view.getMeasuredWidth();
+		final int height = view.getMeasuredHeight();
 
-        if (mBitmap == null || mBitmap.getWidth() != width || mBitmap.getHeight() != height) {
-            mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            mCanvas = new Canvas(mBitmap);
-        }
+		if (mBitmap == null || mBitmap.getWidth() != width || mBitmap.getHeight() != height) {
+			mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+			mCanvas = new Canvas(mBitmap);
+		}
 
-        DragLayer.LayoutParams lp;
-        if (getLayoutParams() instanceof DragLayer.LayoutParams) {
-            lp = (DragLayer.LayoutParams) getLayoutParams();
-        } else {
-            lp = new DragLayer.LayoutParams(width, height);
-        }
+		DragLayer.LayoutParams lp;
+		if (getLayoutParams() instanceof DragLayer.LayoutParams) {
+			lp = (DragLayer.LayoutParams) getLayoutParams();
+		} else {
+			lp = new DragLayer.LayoutParams(width, height);
+		}
 
-        // The layout from which the folder is being opened may be scaled, adjust the starting
-        // view size by this scale factor.
-        float scale = mParent.getDescendantRectRelativeToSelf(view, mTempRect);
-        lp.customPosition = true;
-        lp.x = mTempRect.left;
-        lp.y = mTempRect.top;
-        lp.width = (int) (scale * width);
-        lp.height = (int) (scale * height);
+		// The layout from which the folder is being opened may be scaled, adjust the starting
+		// view size by this scale factor.
+		float scale = mParent.getDescendantRectRelativeToSelf(view, mTempRect);
+		lp.customPosition = true;
+		lp.x = mTempRect.left;
+		lp.y = mTempRect.top;
+		lp.width = (int) (scale * width);
+		lp.height = (int) (scale * height);
 
-        mCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        view.draw(mCanvas);
-        setImageBitmap(mBitmap);
+		mCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+		view.draw(mCanvas);
+		setImageBitmap(mBitmap);
 
-        // Just in case this image view is still in the drag layer from a previous animation,
-        // we remove it and re-add it.
-        removeFromParent();
-        mParent.addView(this, lp);
-    }
+		// Just in case this image view is still in the drag layer from a previous animation,
+		// we remove it and re-add it.
+		removeFromParent();
+		mParent.addView(this, lp);
+	}
 
-    public void removeFromParent() {
-        if (mParent.indexOfChild(this) != -1) {
-            mParent.removeView(this);
-        }
-    }
+	public void removeFromParent() {
+		if (mParent.indexOfChild(this) != -1) {
+			mParent.removeView(this);
+		}
+	}
 
-    public static PreviewImageView get(Context context) {
-        DragLayer dragLayer = Launcher.getLauncher(context).getDragLayer();
-        PreviewImageView view = (PreviewImageView) dragLayer.getTag(R.id.preview_image_id);
-        if (view == null) {
-            view = new PreviewImageView(dragLayer);
-            dragLayer.setTag(R.id.preview_image_id, view);
-        }
-        return view;
-    }
+	public static PreviewImageView get(Context context) {
+		DragLayer dragLayer = Launcher.getLauncher(context).getDragLayer();
+		PreviewImageView view = (PreviewImageView) dragLayer.getTag(R.id.preview_image_id);
+		if (view == null) {
+			view = new PreviewImageView(dragLayer);
+			dragLayer.setTag(R.id.preview_image_id, view);
+		}
+		return view;
+	}
 }

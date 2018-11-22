@@ -24,65 +24,65 @@ import android.view.ViewConfiguration;
 
 public class VerticalFlingDetector implements View.OnTouchListener {
 
-    private static final float CUSTOM_SLOP_MULTIPLIER = 2.2f;
-    private static final int SEC_IN_MILLIS = 1000;
+	private static final float CUSTOM_SLOP_MULTIPLIER = 2.2f;
+	private static final int SEC_IN_MILLIS = 1000;
 
-    private VelocityTracker mVelocityTracker;
-    private float mMinimumFlingVelocity;
-    private float mMaximumFlingVelocity;
-    private float mDownX, mDownY;
-    private boolean mShouldCheckFling;
-    private double mCustomTouchSlop;
+	private VelocityTracker mVelocityTracker;
+	private float mMinimumFlingVelocity;
+	private float mMaximumFlingVelocity;
+	private float mDownX, mDownY;
+	private boolean mShouldCheckFling;
+	private double mCustomTouchSlop;
 
-    public VerticalFlingDetector(Context context) {
-        ViewConfiguration vc = ViewConfiguration.get(context);
-        mMinimumFlingVelocity = vc.getScaledMinimumFlingVelocity();
-        mMaximumFlingVelocity = vc.getScaledMaximumFlingVelocity();
-        mCustomTouchSlop = CUSTOM_SLOP_MULTIPLIER * vc.getScaledTouchSlop();
-    }
+	public VerticalFlingDetector(Context context) {
+		ViewConfiguration vc = ViewConfiguration.get(context);
+		mMinimumFlingVelocity = vc.getScaledMinimumFlingVelocity();
+		mMaximumFlingVelocity = vc.getScaledMaximumFlingVelocity();
+		mCustomTouchSlop = CUSTOM_SLOP_MULTIPLIER * vc.getScaledTouchSlop();
+	}
 
-    @Override
-    public boolean onTouch(View v, MotionEvent ev) {
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
-        mVelocityTracker.addMovement(ev);
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mDownX = ev.getX();
-                mDownY = ev.getY();
-                mShouldCheckFling = false;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (mShouldCheckFling) {
-                    break;
-                }
-                if (Math.abs(ev.getY() - mDownY) > mCustomTouchSlop &&
-                        Math.abs(ev.getY() - mDownY) > Math.abs(ev.getX() - mDownX)) {
-                    mShouldCheckFling = true;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                if (mShouldCheckFling) {
-                    mVelocityTracker.computeCurrentVelocity(SEC_IN_MILLIS, mMaximumFlingVelocity);
-                    // only when fling is detected in down direction
-                    if (mVelocityTracker.getYVelocity() > mMinimumFlingVelocity) {
-                        cleanUp();
-                        return true;
-                    }
-                }
-                // fall through.
-            case MotionEvent.ACTION_CANCEL:
-                cleanUp();
-        }
-        return false;
-    }
+	@Override
+	public boolean onTouch(View v, MotionEvent ev) {
+		if (mVelocityTracker == null) {
+			mVelocityTracker = VelocityTracker.obtain();
+		}
+		mVelocityTracker.addMovement(ev);
+		switch (ev.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				mDownX = ev.getX();
+				mDownY = ev.getY();
+				mShouldCheckFling = false;
+				break;
+			case MotionEvent.ACTION_MOVE:
+				if (mShouldCheckFling) {
+					break;
+				}
+				if (Math.abs(ev.getY() - mDownY) > mCustomTouchSlop &&
+						Math.abs(ev.getY() - mDownY) > Math.abs(ev.getX() - mDownX)) {
+					mShouldCheckFling = true;
+				}
+				break;
+			case MotionEvent.ACTION_UP:
+				if (mShouldCheckFling) {
+					mVelocityTracker.computeCurrentVelocity(SEC_IN_MILLIS, mMaximumFlingVelocity);
+					// only when fling is detected in down direction
+					if (mVelocityTracker.getYVelocity() > mMinimumFlingVelocity) {
+						cleanUp();
+						return true;
+					}
+				}
+				// fall through.
+			case MotionEvent.ACTION_CANCEL:
+				cleanUp();
+		}
+		return false;
+	}
 
-    private void cleanUp() {
-        if (mVelocityTracker == null) {
-            return;
-        }
-        mVelocityTracker.recycle();
-        mVelocityTracker = null;
-    }
+	private void cleanUp() {
+		if (mVelocityTracker == null) {
+			return;
+		}
+		mVelocityTracker.recycle();
+		mVelocityTracker = null;
+	}
 }

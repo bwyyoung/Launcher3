@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<?xml version="1.0" encoding="UTF-8"?><!--
 /*
 * Copyright (C) 2008 The Android Open Source Project
 *
@@ -17,8 +16,7 @@
 */
  -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name" msgid="649227358658669779">"Launcher3"</string>
     <string name="folder_name" msgid="7371454440695724752"></string>
     <string name="work_folder_name" msgid="3753320833950115786">"Εργασία"</string>
@@ -147,8 +145,8 @@
     <string name="msg_disable_suggestions_prompt">Οι προτάσεις που δεν θα εμφανίζονται στο επάνω μέρος της λίστας των εφαρμογών σας και τα δεδομένα χρήσης που χρησιμοποιούνται για τη δημιουργία τους θα διαγραφούν οριστικά.</string>
     <string name="label_turn_off_suggestions">ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ</string>
     <string name="action_edit">Επεξεργασία</string>
-  <string name="hide_app_sum">Απόκρυψη εφαρμογών από το συρτάρι εφαρμογών</string>
-  <string name="hide_app">Κρυφές εφαρμογές</string>
+    <string name="hide_app_sum">Απόκρυψη εφαρμογών από το συρτάρι εφαρμογών</string>
+    <string name="hide_app">Κρυφές εφαρμογές</string>
     <string name="icon_shape_rounded_square">Στρογγυλεμένο τετράγωνο</string>
     <string name="smartspace_hours_mins">%1$s %2$s</string>
     <string name="icon_shape_cylinder">Κύλινδρος</string>

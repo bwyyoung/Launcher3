@@ -39,77 +39,78 @@ import static org.mockito.Mockito.verify;
 @RunWith(AndroidJUnit4.class)
 public class SwipeDetectorTest {
 
-    private static final String TAG = SwipeDetectorTest.class.getSimpleName();
-    public static void L(String s, Object... parts) {
-        Log.d(TAG, (parts.length == 0) ? s : String.format(s, parts));
-    }
+	private static final String TAG = SwipeDetectorTest.class.getSimpleName();
 
-    private TouchEventGenerator mGenerator;
-    private SwipeDetector mDetector;
-    private int mTouchSlop;
+	public static void L(String s, Object... parts) {
+		Log.d(TAG, (parts.length == 0) ? s : String.format(s, parts));
+	}
 
-    @Mock
-    private SwipeDetector.Listener mMockListener;
+	private TouchEventGenerator mGenerator;
+	private SwipeDetector mDetector;
+	private int mTouchSlop;
 
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        mGenerator = new TouchEventGenerator(new TouchEventGenerator.Listener() {
-            @Override
-            public void onTouchEvent(MotionEvent event) {
-                mDetector.onTouchEvent(event);
-            }
-        });
+	@Mock
+	private SwipeDetector.Listener mMockListener;
 
-        mDetector = new SwipeDetector(mTouchSlop, mMockListener, SwipeDetector.VERTICAL);
-        mDetector.setDetectableScrollConditions(SwipeDetector.DIRECTION_BOTH, false);
-        mTouchSlop = ViewConfiguration.get(InstrumentationRegistry.getTargetContext())
-                .getScaledTouchSlop();
-        L("mTouchSlop=", mTouchSlop);
-    }
+	@Before
+	public void setup() {
+		MockitoAnnotations.initMocks(this);
+		mGenerator = new TouchEventGenerator(new TouchEventGenerator.Listener() {
+			@Override
+			public void onTouchEvent(MotionEvent event) {
+				mDetector.onTouchEvent(event);
+			}
+		});
 
-    @Test
-    public void testDragStart_vertical() throws Exception {
-        mGenerator.put(0, 100, 100);
-        mGenerator.move(0, 100, 100 + mTouchSlop);
-        // TODO: actually calculate the following parameters and do exact value checks.
-        verify(mMockListener).onDragStart(anyBoolean());
-    }
+		mDetector = new SwipeDetector(mTouchSlop, mMockListener, SwipeDetector.VERTICAL);
+		mDetector.setDetectableScrollConditions(SwipeDetector.DIRECTION_BOTH, false);
+		mTouchSlop = ViewConfiguration.get(InstrumentationRegistry.getTargetContext())
+				.getScaledTouchSlop();
+		L("mTouchSlop=", mTouchSlop);
+	}
 
-    @Test
-    public void testDragStart_failed() throws Exception {
-        mGenerator.put(0, 100, 100);
-        mGenerator.move(0, 100 + mTouchSlop, 100);
-        // TODO: actually calculate the following parameters and do exact value checks.
-        verify(mMockListener, never()).onDragStart(anyBoolean());
-    }
+	@Test
+	public void testDragStart_vertical() throws Exception {
+		mGenerator.put(0, 100, 100);
+		mGenerator.move(0, 100, 100 + mTouchSlop);
+		// TODO: actually calculate the following parameters and do exact value checks.
+		verify(mMockListener).onDragStart(anyBoolean());
+	}
 
-    @Test
-    public void testDragStart_horizontal() throws Exception {
-        mDetector = new SwipeDetector(mTouchSlop, mMockListener, SwipeDetector.HORIZONTAL);
-        mDetector.setDetectableScrollConditions(SwipeDetector.DIRECTION_BOTH, false);
+	@Test
+	public void testDragStart_failed() throws Exception {
+		mGenerator.put(0, 100, 100);
+		mGenerator.move(0, 100 + mTouchSlop, 100);
+		// TODO: actually calculate the following parameters and do exact value checks.
+		verify(mMockListener, never()).onDragStart(anyBoolean());
+	}
 
-        mGenerator.put(0, 100, 100);
-        mGenerator.move(0, 100 + mTouchSlop, 100);
-        // TODO: actually calculate the following parameters and do exact value checks.
-        verify(mMockListener).onDragStart(anyBoolean());
-    }
+	@Test
+	public void testDragStart_horizontal() throws Exception {
+		mDetector = new SwipeDetector(mTouchSlop, mMockListener, SwipeDetector.HORIZONTAL);
+		mDetector.setDetectableScrollConditions(SwipeDetector.DIRECTION_BOTH, false);
 
-    @Test
-    public void testDrag() throws Exception {
-        mGenerator.put(0, 100, 100);
-        mGenerator.move(0, 100, 100 + mTouchSlop);
-        // TODO: actually calculate the following parameters and do exact value checks.
-        verify(mMockListener).onDrag(anyFloat(), anyFloat());
-    }
+		mGenerator.put(0, 100, 100);
+		mGenerator.move(0, 100 + mTouchSlop, 100);
+		// TODO: actually calculate the following parameters and do exact value checks.
+		verify(mMockListener).onDragStart(anyBoolean());
+	}
 
-    @Test
-    public void testDragEnd() throws Exception {
-        mGenerator.put(0, 100, 100);
-        mGenerator.move(0, 100, 100 + mTouchSlop);
-        mGenerator.move(0, 100, 100 + mTouchSlop * 2);
-        mGenerator.lift(0);
-        // TODO: actually calculate the following parameters and do exact value checks.
-        verify(mMockListener).onDragEnd(anyFloat(), anyBoolean());
-    }
+	@Test
+	public void testDrag() throws Exception {
+		mGenerator.put(0, 100, 100);
+		mGenerator.move(0, 100, 100 + mTouchSlop);
+		// TODO: actually calculate the following parameters and do exact value checks.
+		verify(mMockListener).onDrag(anyFloat(), anyFloat());
+	}
+
+	@Test
+	public void testDragEnd() throws Exception {
+		mGenerator.put(0, 100, 100);
+		mGenerator.move(0, 100, 100 + mTouchSlop);
+		mGenerator.move(0, 100, 100 + mTouchSlop * 2);
+		mGenerator.lift(0);
+		// TODO: actually calculate the following parameters and do exact value checks.
+		verify(mMockListener).onDragEnd(anyFloat(), anyBoolean());
+	}
 }

@@ -34,47 +34,47 @@ import java.util.List;
 
 public abstract class AppWidgetManagerCompat {
 
-    private static final Object sInstanceLock = new Object();
-    private static AppWidgetManagerCompat sInstance;
+	private static final Object sInstanceLock = new Object();
+	private static AppWidgetManagerCompat sInstance;
 
-    public static AppWidgetManagerCompat getInstance(Context context) {
-        synchronized (sInstanceLock) {
-            if (sInstance == null) {
-                if (Utilities.ATLEAST_OREO) {
-                    sInstance = new AppWidgetManagerCompatVO(context.getApplicationContext());
-                } else {
-                    sInstance = new AppWidgetManagerCompatVL(context.getApplicationContext());
-                }
-            }
-            return sInstance;
-        }
-    }
+	public static AppWidgetManagerCompat getInstance(Context context) {
+		synchronized (sInstanceLock) {
+			if (sInstance == null) {
+				if (Utilities.ATLEAST_OREO) {
+					sInstance = new AppWidgetManagerCompatVO(context.getApplicationContext());
+				} else {
+					sInstance = new AppWidgetManagerCompatVL(context.getApplicationContext());
+				}
+			}
+			return sInstance;
+		}
+	}
 
-    final AppWidgetManager mAppWidgetManager;
-    final Context mContext;
+	final AppWidgetManager mAppWidgetManager;
+	final Context mContext;
 
-    AppWidgetManagerCompat(Context context) {
-        mContext = context;
-        mAppWidgetManager = AppWidgetManager.getInstance(context);
-    }
+	AppWidgetManagerCompat(Context context) {
+		mContext = context;
+		mAppWidgetManager = AppWidgetManager.getInstance(context);
+	}
 
-    public AppWidgetProviderInfo getAppWidgetInfo(int appWidgetId) {
-        return mAppWidgetManager.getAppWidgetInfo(appWidgetId);
-    }
+	public AppWidgetProviderInfo getAppWidgetInfo(int appWidgetId) {
+		return mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+	}
 
-    public LauncherAppWidgetProviderInfo getLauncherAppWidgetInfo(int appWidgetId) {
-        AppWidgetProviderInfo info = getAppWidgetInfo(appWidgetId);
-        return info == null ? null : LauncherAppWidgetProviderInfo.fromProviderInfo(mContext, info);
-    }
+	public LauncherAppWidgetProviderInfo getLauncherAppWidgetInfo(int appWidgetId) {
+		AppWidgetProviderInfo info = getAppWidgetInfo(appWidgetId);
+		return info == null ? null : LauncherAppWidgetProviderInfo.fromProviderInfo(mContext, info);
+	}
 
-    public abstract List<AppWidgetProviderInfo> getAllProviders(
-            @Nullable PackageUserKey packageUser);
+	public abstract List<AppWidgetProviderInfo> getAllProviders(
+			@Nullable PackageUserKey packageUser);
 
-    public abstract boolean bindAppWidgetIdIfAllowed(
-            int appWidgetId, AppWidgetProviderInfo info, Bundle options);
+	public abstract boolean bindAppWidgetIdIfAllowed(
+			int appWidgetId, AppWidgetProviderInfo info, Bundle options);
 
-    public abstract LauncherAppWidgetProviderInfo findProvider(
-            ComponentName provider, UserHandle user);
+	public abstract LauncherAppWidgetProviderInfo findProvider(
+			ComponentName provider, UserHandle user);
 
-    public abstract HashMap<ComponentKey, AppWidgetProviderInfo> getAllProvidersMap();
+	public abstract HashMap<ComponentKey, AppWidgetProviderInfo> getAllProvidersMap();
 }
